@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>サロン Mode J 売上管理システム v13.14</title>
+    <title>サロン Mode J 売上管理システム v13.15</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -753,7 +753,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌸 サロン Mode J 売上管理システム <span class="version">v13.14</span></h1>
+            <h1>🌸 サロン Mode J 売上管理システム <span class="version">v13.15</span></h1>
         </div>
 
         <div class="tabs">
@@ -913,7 +913,7 @@
         <div id="dashboard-tab" class="tab-content">
             <h2 style="margin-bottom: 25px; color: #667eea; font-size: 32px; font-weight: 700; text-align: center;">📈 経営ダッシュボード</h2>
             
-            <!-- v13.14: 対象期間（開始年月〜終了年月） -->
+            <!-- v13.15: 対象期間（開始年月〜終了年月） -->
             <div style="text-align: center; margin-bottom: 30px;">
                 <div style="font-size: 14px; color: #999; margin-bottom: 8px; font-weight: 600;">対象期間</div>
                 <div id="dashboard-period-display" style="font-size: 28px; font-weight: 700; color: #667eea; margin-bottom: 15px;">2025年12月 〜 2025年12月</div>
@@ -940,7 +940,7 @@
                 </div>
             </div>
 
-            <!-- v13.14: 5つの重要指標 -->
+            <!-- v13.15: 5つの重要指標 -->
             <div class="dashboard-grid" style="grid-template-columns: repeat(5, 1fr); gap: 15px;">
                 <div class="dashboard-card">
                     <h3 style="font-size: 16px; margin-bottom: 10px;">💰 総売上</h3>
@@ -966,7 +966,7 @@
 
             <h3 style="margin: 30px 0 15px 0; color: #667eea; font-size: 18px;">💳 決済方法別分析</h3>
             
-            <!-- v13.14: マトリックス表と円グラフの2列レイアウト -->
+            <!-- v13.15: マトリックス表と円グラフの2列レイアウト -->
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 30px;">
                 
                 <!-- 左: マトリックス表 -->
@@ -996,11 +996,11 @@
                     </div>
                 </div>
             </div>
-            <!-- v13.14: ランキングTOP10 大見出し -->\n            <div style="margin: 40px 0 30px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3); text-align: center;">
+            <!-- v13.15: ランキングTOP10 大見出し -->\n            <div style="margin: 40px 0 30px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3); text-align: center;">
                 <h2 style="color: white; font-size: 28px; font-weight: 700; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">🏆 ランキング TOP 10</h2>
             </div>
 
-            <!-- v13.14: 2列レイアウト: カテゴリー別 & 商品別 -->
+            <!-- v13.15: 2列レイアウト: カテゴリー別 & 商品別 -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -1028,7 +1028,7 @@
                 </div>
             </div>
 
-            <!-- v13.14: お客様別売上 -->
+            <!-- v13.15: お客様別売上 -->
             <div style="margin-bottom: 30px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3 style="margin: 0; color: #667eea; font-size: 18px; font-weight: 700;">🏆 お客様別売上</h3>
@@ -1042,14 +1042,27 @@
                 </div>
             </div>
 
-            <h3 style="margin: 30px 0 15px 0; color: #667eea; font-size: 18px;">📅 日別売上</h3>
+            <!-- v13.15: 日別売上改善版 -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 25px; border-radius: 12px 12px 0 0; margin-top: 30px;">
+                <h2 style="color: white; font-size: 28px; font-weight: 700; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">📅 日別売上トレンド</h2>
+            </div>
+            
+            <!-- トレンドグラフ -->
+            <div style="background: white; padding: 25px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                <canvas id="daily-sales-chart" style="width: 100%; height: 300px;"></canvas>
+            </div>
+            
+            <!-- 日別詳細テーブル -->
             <div style="overflow-x: auto;">
                 <table class="daily-sales-table" id="daily-sales-table">
                     <thead>
                         <tr>
                             <th>日付</th>
+                            <th>曜日</th>
                             <th>売上</th>
                             <th>件数</th>
+                            <th>前日比</th>
+                            <th>7日平均</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1097,7 +1110,7 @@
                 <h3>ℹ️ システム情報</h3>
                 <div class="settings-item">
                     <label>バージョン:</label>
-                    <div class="value">v13.14 (Phase 4-D: ランキングTOP10改善版)</div>
+                    <div class="value">v13.15 (Phase 4-E: 日別売上改善版)</div>
                 </div>
                 <div class="settings-item">
                     <label>最終更新:</label>
@@ -1120,10 +1133,10 @@
         var listPeriodStart = null;
         var listPeriodEnd = null;
         var currentPeriodType = 'current-month';
-        var rankingDisplayCount = { category: 5, product: 5, customer: 5 }; // v13.14: ランキング表示件数
+        var rankingDisplayCount = { category: 5, product: 5, customer: 5 }; // v13.15: ランキング表示件数
 
         // v13.10 システム起動ログ
-        console.log('🌸 サロン Mode J 売上管理システム v13.14 起動 - Phase 4-D: ランキングTOP10改善版');
+        console.log('🌸 サロン Mode J 売上管理システム v13.15 起動 - Phase 4-E: 日別売上改善版');
         console.log('📊 Google Sheets連携: 有効（CORS対応版 - no-cors mode）');
         console.log('🔗 GAS URL:', GAS_URL);
 
@@ -1210,7 +1223,7 @@
         // 今日の日付を更新（v13.6.1で追加）
         function updateTodayDate() {
             var today = new Date();
-            var todayString = formatDateISO(today); // v13.14: タイムゾーン問題解決
+            var todayString = formatDateISO(today); // v13.15: タイムゾーン問題解決
             document.getElementById('sale-date').value = todayString;
             console.log('📅 今日の日付を更新:', todayString);
         }
@@ -1265,7 +1278,7 @@
         
         // ダッシュボード期間を今日に更新（v13.6.1で追加）
         function updateDashboardPeriod() {
-            // v13.14: 年月単位で期間表示を更新
+            // v13.15: 年月単位で期間表示を更新
             var today = new Date();
             dashboardStartYear = today.getFullYear();
             dashboardStartMonth = today.getMonth() + 1;
@@ -1277,7 +1290,7 @@
                 displayElement.textContent = dashboardStartYear + '年' + dashboardStartMonth + '月 〜 ' + dashboardEndYear + '年' + dashboardEndMonth + '月';
             }
             
-            // v13.14 A案: デートピッカーの初期値を設定
+            // v13.15 A案: デートピッカーの初期値を設定
             var startPeriod = dashboardStartYear + '-' + String(dashboardStartMonth).padStart(2, '0');
             var endPeriod = dashboardEndYear + '-' + String(dashboardEndMonth).padStart(2, '0');
             var startPicker = document.getElementById('dashboard-start-period');
@@ -1556,7 +1569,7 @@
             return year + '年' + month + '月' + day + '日';
         }
         
-        // v13.14: 日付をYYYY-MM-DD形式に変換（タイムゾーン問題解決）
+        // v13.15: 日付をYYYY-MM-DD形式に変換（タイムゾーン問題解決）
         function formatDateISO(date) {
             var year = date.getFullYear();
             var month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1615,7 +1628,7 @@
                 displayText = '先々月 (' + formatDate(start) + ' 〜 ' + formatDate(end) + ')';
             }
             
-            // v13.14: タイムゾーン問題解決 - toISOString()の代わりにformatDateISO()を使用
+            // v13.15: タイムゾーン問題解決 - toISOString()の代わりにformatDateISO()を使用
             listPeriodStart = formatDateISO(start);
             listPeriodEnd = formatDateISO(end);
             
@@ -1725,7 +1738,7 @@
         // 日次・週次・月次集計
         function calculateDailyWeeklyMonthlySales() {
             var today = new Date();
-            var todayStr = formatDateISO(today); // v13.14: タイムゾーン問題解決
+            var todayStr = formatDateISO(today); // v13.15: タイムゾーン問題解決
             
             var todaySales = 0, todayCount = 0;
             var weekSales = 0, weekCount = 0;
@@ -1734,12 +1747,12 @@
             var dayOfWeek = today.getDay();
             var weekStart = new Date(today);
             weekStart.setDate(today.getDate() - dayOfWeek);
-            var weekStartStr = formatDateISO(weekStart); // v13.14: タイムゾーン問題解決
+            var weekStartStr = formatDateISO(weekStart); // v13.15: タイムゾーン問題解決
             
             var monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            var monthStartStr = formatDateISO(monthStart); // v13.14: タイムゾーン問題解決
+            var monthStartStr = formatDateISO(monthStart); // v13.15: タイムゾーン問題解決
             
-            // v13.14: 取引件数 = 明細（items）の合計数
+            // v13.15: 取引件数 = 明細（items）の合計数
             for (var i = 0; i < salesData.length; i++) {
                 var sale = salesData[i];
                 var itemCount = (sale.items && sale.items.length > 0) ? sale.items.length : 0;
@@ -2171,13 +2184,13 @@
         }
 
         // ダッシュボード表示
-        // ダッシュボード: グローバル変数（v13.14）
+        // ダッシュボード: グローバル変数（v13.15）
         var dashboardStartYear = new Date().getFullYear();
         var dashboardStartMonth = new Date().getMonth() + 1;
         var dashboardEndYear = new Date().getFullYear();
         var dashboardEndMonth = new Date().getMonth() + 1;
         
-        // v13.14: ランキング表示件数切り替え関数
+        // v13.15: ランキング表示件数切り替え関数
         function toggleRankingView(type, count) {
             rankingDisplayCount[type] = count;
             
@@ -2208,7 +2221,7 @@
         }
 
         function renderDashboard() {
-            // v13.14: 開始年月〜終了年月で期間を計算
+            // v13.15: 開始年月〜終了年月で期間を計算
             var periodStart = dashboardStartYear + '-' + String(dashboardStartMonth).padStart(2, '0') + '-01';
             var lastDay = new Date(dashboardEndYear, dashboardEndMonth, 0).getDate();
             var periodEnd = dashboardEndYear + '-' + String(dashboardEndMonth).padStart(2, '0') + '-' + String(lastDay).padStart(2, '0');
@@ -2222,7 +2235,7 @@
             });
             
             // 総売上・取引件数・平均取引額
-            // v13.14: 取引件数 = 明細（items）の合計数
+            // v13.15: 取引件数 = 明細（items）の合計数
             var totalSales = 0;
             var totalTransactions = 0;
             
@@ -2242,7 +2255,7 @@
             document.getElementById('average-transaction').textContent = '¥' + averageTransaction.toLocaleString();
             
             
-            // v13.14: 顧客数と平均顧客単価を計算
+            // v13.15: 顧客数と平均顧客単価を計算
             var customerStats = {};
             for (var i = 0; i < filteredData.length; i++) {
                 var sale = filteredData[i];
@@ -2260,7 +2273,7 @@
             
             console.log('📊 ダッシュボード指標:');
             console.log("📊 取引件数:", totalTransactions, "件 | 顧客数:", customerCount, "人 | ✅", totalTransactions >= customerCount ? "正常" : "異常");
-            // v13.14: 決済方法別分析（マトリックス表 + 円グラフ）
+            // v13.15: 決済方法別分析（マトリックス表 + 円グラフ）
             var paymentStats = {
                 '現金': { total: 0, count: 0 },
                 '振込': { total: 0, count: 0 },
@@ -2350,7 +2363,7 @@
             }
             var categoryStats = {};
             
-            // v13.14: 凡例を生成
+            // v13.15: 凡例を生成
             var legendHTML = '';
             var paymentMethods = ['現金', '振込', 'クレジットカード'];
             var icons = ['💵', '🏦', '💳'];
@@ -2385,7 +2398,7 @@
                 }
             }
             
-            // v13.14: カテゴリ別ランキング（TOP 5/10切り替え対応）
+            // v13.15: カテゴリ別ランキング（TOP 5/10切り替え対応）
             var categoryRanking = Object.keys(categoryStats).map(function(category) {
                 return {
                     name: category,
@@ -2429,7 +2442,7 @@
                 }
             }
             
-            // v13.14: 商品別ランキング(TOP 5/10切り替え対応)
+            // v13.15: 商品別ランキング(TOP 5/10切り替え対応)
             var productRanking = Object.keys(productStats).map(function(product) {
                 return {
                     name: product,
@@ -2467,7 +2480,7 @@
                 customerStats[sale.customerName].sales += sale.totalAmount;
             }
             
-            // v13.14: 顧客別ランキング(TOP 5/10切り替え対応)
+            // v13.15: 顧客別ランキング(TOP 5/10切り替え対応)
             var customerRanking = Object.keys(customerStats).map(function(customer) {
                 return {
                     name: customer,
@@ -2494,7 +2507,7 @@
             }
             document.getElementById('customer-ranking').innerHTML = customerRankingHTML || '<div class="empty-state">データがありません</div>';
             
-            // 日別売上
+            // v13.15: 日別売上改善版（トレンドグラフ + 前日比 + 移動平均）
             var dailyStats = {};
             for (var i = 0; i < filteredData.length; i++) {
                 var sale = filteredData[i];
@@ -2512,23 +2525,174 @@
                     sales: dailyStats[date].sales
                 };
             }).sort(function(a, b) {
-                return b.date.localeCompare(a.date);
+                return a.date.localeCompare(b.date); // 日付昇順に並べ替え
             });
             
-            var dailyTableHTML = '';
+            // 曜日取得関数
+            function getDayOfWeek(dateStr) {
+                var days = ['日', '月', '火', '水', '木', '金', '土'];
+                var parts = dateStr.split('-');
+                var date = new Date(parts[0], parts[1] - 1, parts[2]);
+                return days[date.getDay()];
+            }
+            
+            // 7日移動平均計算
             for (var i = 0; i < dailySales.length; i++) {
+                var sum = 0;
+                var count = 0;
+                for (var j = Math.max(0, i - 6); j <= i; j++) {
+                    sum += dailySales[j].sales;
+                    count++;
+                }
+                dailySales[i].movingAvg = Math.floor(sum / count);
+            }
+            
+            // トレンドグラフ描画
+            var canvas = document.getElementById('daily-sales-chart');
+            if (canvas && dailySales.length > 0) {
+                var ctx = canvas.getContext('2d');
+                var width = canvas.offsetWidth;
+                var height = 300;
+                canvas.width = width;
+                canvas.height = height;
+                
+                // 最大値を取得
+                var maxSales = Math.max.apply(null, dailySales.map(function(d) { return d.sales; }));
+                var padding = 50;
+                var chartWidth = width - padding * 2;
+                var chartHeight = height - padding * 2;
+                var stepX = chartWidth / Math.max(1, dailySales.length - 1);
+                
+                // 背景
+                ctx.fillStyle = '#f9fafb';
+                ctx.fillRect(0, 0, width, height);
+                
+                // グリッド線（5本）
+                ctx.strokeStyle = '#e5e7eb';
+                ctx.lineWidth = 1;
+                for (var i = 0; i <= 5; i++) {
+                    var y = padding + (chartHeight / 5) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(padding, y);
+                    ctx.lineTo(width - padding, y);
+                    ctx.stroke();
+                    
+                    // 目盛りラベル
+                    var value = maxSales * (1 - i / 5);
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px sans-serif';
+                    ctx.textAlign = 'right';
+                    ctx.fillText('¥' + Math.floor(value / 1000) + 'k', padding - 10, y + 4);
+                }
+                
+                // 売上折れ線グラフ
+                ctx.strokeStyle = '#667eea';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (var i = 0; i < dailySales.length; i++) {
+                    var x = padding + stepX * i;
+                    var y = padding + chartHeight - (dailySales[i].sales / maxSales * chartHeight);
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+                
+                // データポイント
+                for (var i = 0; i < dailySales.length; i++) {
+                    var x = padding + stepX * i;
+                    var y = padding + chartHeight - (dailySales[i].sales / maxSales * chartHeight);
+                    ctx.fillStyle = '#667eea';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // 7日移動平均線
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                for (var i = 0; i < dailySales.length; i++) {
+                    var x = padding + stepX * i;
+                    var y = padding + chartHeight - (dailySales[i].movingAvg / maxSales * chartHeight);
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // 凡例
+                ctx.fillStyle = '#667eea';
+                ctx.fillRect(width - 180, 15, 20, 3);
+                ctx.fillStyle = '#333';
+                ctx.font = '13px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('日別売上', width - 155, 20);
+                
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(width - 180, 35);
+                ctx.lineTo(width - 160, 35);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#333';
+                ctx.fillText('7日移動平均', width - 155, 38);
+            }
+            
+            // 日別テーブル生成（降順で表示）
+            var dailyTableHTML = '';
+            var maxDailySales = Math.max.apply(null, dailySales.map(function(d) { return d.sales; }));
+            
+            for (var i = dailySales.length - 1; i >= 0; i--) {
                 var day = dailySales[i];
-                dailyTableHTML += '<tr>' +
-                    '<td style="font-weight: 600; color: #667eea;">' + day.date + '</td>' +
+                var dayOfWeek = getDayOfWeek(day.date);
+                var isWeekend = dayOfWeek === '土' || dayOfWeek === '日';
+                var isTopSales = day.sales === maxDailySales;
+                
+                // 前日比計算
+                var prevDayChange = '';
+                var changeStyle = '';
+                if (i > 0) {
+                    var prevSales = dailySales[i - 1].sales;
+                    var diff = day.sales - prevSales;
+                    var diffPercent = prevSales > 0 ? ((diff / prevSales) * 100).toFixed(1) : 0;
+                    if (diff > 0) {
+                        prevDayChange = '<span style="color: #059669; font-weight: 600;">▲ ' + diffPercent + '%</span>';
+                    } else if (diff < 0) {
+                        prevDayChange = '<span style="color: #dc2626; font-weight: 600;">▼ ' + Math.abs(diffPercent) + '%</span>';
+                    } else {
+                        prevDayChange = '<span style="color: #6b7280;">—</span>';
+                    }
+                } else {
+                    prevDayChange = '<span style="color: #6b7280;">—</span>';
+                }
+                
+                var rowBg = isTopSales ? 'background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);' : 
+                            isWeekend ? 'background: #dbeafe;' : '';
+                var dayColor = isWeekend ? 'color: #dc2626; font-weight: 700;' : 'color: #667eea; font-weight: 600;';
+                
+                dailyTableHTML += '<tr style="' + rowBg + '">' +
+                    '<td style="' + dayColor + '">' + day.date + (isTopSales ? ' 🏆' : '') + '</td>' +
+                    '<td style="font-weight: 600; color: ' + (isWeekend ? '#dc2626' : '#333') + ';">' + dayOfWeek + '</td>' +
                     '<td style="font-weight: 700; color: #333;">¥' + day.sales.toLocaleString() + '</td>' +
                     '<td style="color: #666;">' + day.count + '件</td>' +
+                    '<td>' + prevDayChange + '</td>' +
+                    '<td style="color: #f59e0b; font-weight: 600;">¥' + day.movingAvg.toLocaleString() + '</td>' +
                 '</tr>';
             }
             document.getElementById('daily-sales-table').querySelector('tbody').innerHTML = 
-                dailyTableHTML || '<tr><td colspan="3" class="empty-state">データがありません</td></tr>';
+                dailyTableHTML || '<tr><td colspan="6" class="empty-state">データがありません</td></tr>';
         }
 
-        // v13.14: ダッシュボード期間選択パネルを開く/閉じる（A案: デートピッカー方式）
+        // v13.15: ダッシュボード期間選択パネルを開く/閉じる（A案: デートピッカー方式）
         function toggleDashboardPeriodSelector() {
             var panel = document.getElementById('dashboard-period-panel');
             var btn = document.getElementById('dashboard-period-btn');
@@ -2551,7 +2715,7 @@
             }
         }
         
-        // v13.14: 期間選択時に表示を更新（A案: デートピッカー方式）
+        // v13.15: 期間選択時に表示を更新（A案: デートピッカー方式）
         function updateDashboardDisplay() {
             var startPeriod = document.getElementById('dashboard-start-period').value; // YYYY-MM形式
             var endPeriod = document.getElementById('dashboard-end-period').value; // YYYY-MM形式
@@ -2570,7 +2734,7 @@
                 startYear + '年' + startMonth + '月 〜 ' + endYear + '年' + endMonth + '月';
         }
         
-        // v13.14: ダッシュボード期間を適用（A案: デートピッカー方式）
+        // v13.15: ダッシュボード期間を適用（A案: デートピッカー方式）
         function applyDashboardPeriod() {
             var startPeriod = document.getElementById('dashboard-start-period').value; // YYYY-MM形式
             var endPeriod = document.getElementById('dashboard-end-period').value; // YYYY-MM形式
