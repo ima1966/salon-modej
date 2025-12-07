@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>サロン Mode J 売上管理システム v13.17</title>
+    <title>サロン Mode J 売上管理システム v13.18</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -753,7 +753,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌸 サロン Mode J 売上管理システム <span class="version">v13.17</span></h1>
+            <h1>🌸 サロン Mode J 売上管理システム <span class="version">v13.18</span></h1>
         </div>
 
         <div class="tabs">
@@ -913,48 +913,7 @@
         <div id="dashboard-tab" class="tab-content">
             <h2 style="margin-bottom: 25px; color: #667eea; font-size: 32px; font-weight: 700; text-align: center;">📈 経営ダッシュボード</h2>
             
-            <!-- v13.17: AI経営アドバイスセクション -->
-            <div id="ai-advice-section" style="max-width: 1200px; margin: 0 auto 40px auto; padding: 25px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2); border: 2px solid #bfdbfe;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div>
-                        <h3 style="margin: 0; color: #1e40af; font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 32px;">🤖</span>
-                            AI経営アドバイス
-                        </h3>
-                        <div id="ai-advice-timestamp" style="color: #64748b; font-size: 13px; margin-top: 5px; font-weight: 600;">
-                            📅 最終更新: 読み込み中...
-                        </div>
-                    </div>
-                    <button onclick="refreshAIAdvice()" id="refresh-ai-btn" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: all 0.3s; display: flex; align-items: center; gap: 8px;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
-                        <span style="font-size: 18px;">🔄</span>
-                        再分析
-                    </button>
-                </div>
-                
-                <div id="ai-advice-content" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); min-height: 200px; color: #334155; font-size: 15px; line-height: 1.8;">
-                    <div style="text-align: center; color: #94a3b8; padding: 40px 0;">
-                        <div style="font-size: 48px; margin-bottom: 15px;">🔄</div>
-                        <div style="font-size: 16px; font-weight: 600;">AI分析を読み込み中...</div>
-                        <div style="font-size: 13px; margin-top: 8px;">初回起動時は数秒かかります</div>
-                    </div>
-                </div>
-                
-                <!-- API Key設定エリア -->
-                <div id="api-key-setup" style="margin-top: 20px; padding: 20px; background: #fef3c7; border-radius: 10px; border-left: 4px solid #f59e0b; display: none;">
-                    <h4 style="margin: 0 0 15px 0; color: #92400e; font-size: 16px; font-weight: 700;">⚠️ Gemini API Keyの設定が必要です</h4>
-                    <div style="margin-bottom: 15px; color: #78350f; font-size: 14px; line-height: 1.6;">
-                        1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: underline;">Google AI Studio</a> でAPI Keyを取得<br>
-                        2. salonmodej2772アカウントでログイン<br>
-                        3. 下記に貼り付けて保存
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="password" id="gemini-api-key-input" placeholder="AIza..." style="flex: 1; padding: 12px; border: 2px solid #f59e0b; border-radius: 8px; font-size: 14px; font-family: monospace;" />
-                        <button onclick="saveGeminiAPIKey()" style="padding: 12px 24px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap;">💾 保存</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- v13.17: 対象期間（開始年月〜終了年月） -->
+            <!-- v13.18: 対象期間（開始年月〜終了年月） -->
             <div style="text-align: center; margin-bottom: 30px;">
                 <div style="font-size: 14px; color: #999; margin-bottom: 8px; font-weight: 600;">対象期間</div>
                 <div id="dashboard-period-display" style="font-size: 28px; font-weight: 700; color: #667eea; margin-bottom: 15px;">2025年12月 〜 2025年12月</div>
@@ -981,7 +940,7 @@
                 </div>
             </div>
 
-            <!-- v13.17: 5つの重要指標 -->
+            <!-- v13.18: 5つの重要指標 -->
             <div class="dashboard-grid" style="grid-template-columns: repeat(5, 1fr); gap: 15px;">
                 <div class="dashboard-card">
                     <h3 style="font-size: 16px; margin-bottom: 10px;">💰 総売上</h3>
@@ -1007,7 +966,7 @@
 
             <h3 style="margin: 30px 0 15px 0; color: #667eea; font-size: 18px;">💳 決済方法別分析</h3>
             
-            <!-- v13.17: マトリックス表と円グラフの2列レイアウト -->
+            <!-- v13.18: マトリックス表と円グラフの2列レイアウト -->
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 30px;">
                 
                 <!-- 左: マトリックス表 -->
@@ -1039,11 +998,11 @@
                     </div>
                 </div>
             </div>
-            <!-- v13.17: ランキングTOP10 大見出し -->\n            <div style="margin: 40px 0 30px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3); text-align: center;">
+            <!-- v13.18: ランキングTOP10 大見出し -->\n            <div style="margin: 40px 0 30px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3); text-align: center;">
                 <h2 style="color: white; font-size: 28px; font-weight: 700; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">🏆 ランキング TOP 10</h2>
             </div>
 
-            <!-- v13.17: 2列レイアウト: カテゴリー別 & 商品別 -->
+            <!-- v13.18: 2列レイアウト: カテゴリー別 & 商品別 -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -1071,7 +1030,7 @@
                 </div>
             </div>
 
-            <!-- v13.17: お客様別売上 -->
+            <!-- v13.18: お客様別売上 -->
             <div style="margin-bottom: 30px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3 style="margin: 0; color: #667eea; font-size: 18px; font-weight: 700;">🏆 お客様別売上</h3>
@@ -1085,7 +1044,7 @@
                 </div>
             </div>
 
-            <!-- v13.17: 日別売上改善版 -->
+            <!-- v13.18: 日別売上改善版 -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 25px; border-radius: 12px 12px 0 0; margin-top: 30px;">
                 <h2 style="color: white; font-size: 28px; font-weight: 700; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">📅 日別売上トレンド</h2>
             </div>
@@ -1153,7 +1112,7 @@
                 <h3>ℹ️ システム情報</h3>
                 <div class="settings-item">
                     <label>バージョン:</label>
-                    <div class="value">v13.17 (Phase 5: AI経営アドバイス実装版)</div>
+                    <div class="value">v13.18 (最終版 - 2026年1月運用開始)</div>
                 </div>
                 <div class="settings-item">
                     <label>最終更新:</label>
@@ -1176,263 +1135,14 @@
         var listPeriodStart = null;
         var listPeriodEnd = null;
         var currentPeriodType = 'current-month';
-        var rankingDisplayCount = { category: 5, product: 5, customer: 5 }; // v13.17: ランキング表示件数
-        var lastAIAdviceUpdate = null; // v13.17: 最終AIアドバイス更新時刻
-        var geminiApiKey = localStorage.getItem('gemini_api_key') || ''; // v13.17: Gemini API Key
+        var rankingDisplayCount = { category: 5, product: 5, customer: 5 }; // v13.18: ランキング表示件数
 
         // v13.10 システム起動ログ
-        console.log('🌸 サロン Mode J 売上管理システム v13.17 起動 - Phase 5: AI経営アドバイス実装版');
+        console.log('🌸 サロン Mode J 売上管理システム v13.18 起動 - 最終版 - 2026年1月運用開始');
         console.log('📊 Google Sheets連携: 有効（CORS対応版 - no-cors mode）');
         console.log('🔗 GAS URL:', GAS_URL);
 
         // ページ読み込み完了時の初期化
-        // v13.17: Gemini API Key保存関数
-        function saveGeminiAPIKey() {
-            var apiKey = document.getElementById('gemini-api-key-input').value.trim();
-            if (!apiKey) {
-                showNotification('API Keyを入力してください', 'error');
-                return;
-            }
-            localStorage.setItem('gemini_api_key', apiKey);
-            geminiApiKey = apiKey;
-            showNotification('API Keyを保存しました', 'success');
-            document.getElementById('api-key-setup').style.display = 'none';
-            refreshAIAdvice();
-        }
-        
-        // v13.17: AIアドバイス再分析
-        function refreshAIAdvice() {
-            generateAIAdvice();
-        }
-        
-        // v13.17: AI経営アドバイス生成
-        async function generateAIAdvice() {
-            var contentDiv = document.getElementById('ai-advice-content');
-            var timestampDiv = document.getElementById('ai-advice-timestamp');
-            var refreshBtn = document.getElementById('refresh-ai-btn');
-            
-            // API Keyチェック
-            if (!geminiApiKey) {
-                document.getElementById('api-key-setup').style.display = 'block';
-                contentDiv.innerHTML = '<div style="text-align: center; color: #f59e0b; padding: 40px 0;"><div style="font-size: 48px; margin-bottom: 15px;">⚠️</div><div style="font-size: 18px; font-weight: 700;">API Keyが設定されていません</div><div style="font-size: 14px; margin-top: 8px;">下記のAPI Key設定エリアから設定してください</div></div>';
-                return;
-            }
-            
-            // ローディング表示
-            refreshBtn.disabled = true;
-            refreshBtn.style.opacity = '0.6';
-            contentDiv.innerHTML = '<div style="text-align: center; color: #3b82f6; padding: 40px 0;"><div style="font-size: 48px; margin-bottom: 15px; animation: spin 2s linear infinite;">🔄</div><div style="font-size: 16px; font-weight: 600;">AIが分析中...</div><div style="font-size: 13px; margin-top: 8px;">数秒お待ちください</div></div><style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>';
-            
-            try {
-                // 分析データを準備
-                var analysisData = prepareAnalysisData();
-                
-                // Gemini API呼び出し
-                var advice = await callGeminiAPI(analysisData);
-                
-                // 結果表示
-                contentDiv.innerHTML = advice;
-                
-                // タイムスタンプ更新
-                var now = new Date();
-                lastAIAdviceUpdate = now;
-                timestampDiv.textContent = '📅 最終更新: ' + now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日 ' + 
-                    String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-                
-                console.log('✅ AIアドバイスを更新しました');
-                
-            } catch (error) {
-                console.error('❌ AIアドバイス生成エラー:', error);
-                contentDiv.innerHTML = '<div style="text-align: center; color: #dc2626; padding: 40px 0;"><div style="font-size: 48px; margin-bottom: 15px;">❌</div><div style="font-size: 18px; font-weight: 700;">分析に失敗しました</div><div style="font-size: 14px; margin-top: 8px; color: #64748b;">' + error.message + '</div><div style="font-size: 13px; margin-top: 12px;"><button onclick="refreshAIAdvice()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">再試行</button></div></div>';
-            } finally {
-                refreshBtn.disabled = false;
-                refreshBtn.style.opacity = '1';
-            }
-        }
-        
-        // v13.17: 分析データの準備
-        function prepareAnalysisData() {
-            var data = {
-                period: {
-                    start: dashboardStartYear + '年' + dashboardStartMonth + '月',
-                    end: dashboardEndYear + '年' + dashboardEndMonth + '月'
-                },
-                customers: [],
-                products: [],
-                totalSales: 0,
-                transactionCount: 0
-            };
-            
-            // 顧客データ集計
-            var customerStats = {};
-            var productStats = {};
-            
-            for (var i = 0; i < salesData.length; i++) {
-                var sale = salesData[i];
-                
-                // 顧客統計
-                if (!customerStats[sale.customerName]) {
-                    customerStats[sale.customerName] = {
-                        name: sale.customerName,
-                        totalAmount: 0,
-                        visitCount: 0,
-                        lastVisit: sale.date
-                    };
-                }
-                customerStats[sale.customerName].totalAmount += sale.totalAmount;
-                customerStats[sale.customerName].visitCount++;
-                if (sale.date > customerStats[sale.customerName].lastVisit) {
-                    customerStats[sale.customerName].lastVisit = sale.date;
-                }
-                
-                // 商品統計
-                if (sale.items && sale.items.length > 0) {
-                    for (var j = 0; j < sale.items.length; j++) {
-                        var item = sale.items[j];
-                        var key = item.category + ' - ' + item.productName;
-                        if (!productStats[key]) {
-                            productStats[key] = {
-                                name: key,
-                                count: 0,
-                                sales: 0
-                            };
-                        }
-                        productStats[key].count++;
-                        productStats[key].sales += item.subtotal;
-                    }
-                }
-            }
-            
-            // 顧客データを配列に変換
-            data.customers = Object.values(customerStats).sort(function(a, b) {
-                return b.totalAmount - a.totalAmount;
-            }).slice(0, 20); // TOP 20顧客
-            
-            // 商品データを配列に変換
-            data.products = Object.values(productStats).sort(function(a, b) {
-                return b.sales - a.sales;
-            }).slice(0, 15); // TOP 15商品
-            
-            return data;
-        }
-        
-        // v13.17: Gemini API呼び出し
-        async function callGeminiAPI(analysisData) {
-            // v13.17: Gemini Proモデルを使用（無料プランで利用可能）
-            var apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + geminiApiKey;
-            
-            var prompt = `あなたはエステサロンの経営コンサルタントです。以下のデータを分析し、経営者に対して具体的で実践的なアドバイスを提供してください。
-
-【対象期間】
-${analysisData.period.start} 〜 ${analysisData.period.end}
-
-【顧客データ（TOP 20）】
-${JSON.stringify(analysisData.customers, null, 2)}
-
-【商品・施術データ（TOP 15）】
-${JSON.stringify(analysisData.products, null, 2)}
-
-【分析要件】
-1. 顧客の偏りや来店が滞っている顧客（lastVisitが60日以上前）を特定
-2. 最近よく売れている商品や、今は売れていない商品のトレンド
-3. 売上に貢献している顧客（ロイヤル顧客、VIP顧客）
-4. その他の経営的な気づきや提案
-
-【出力形式】
-HTML形式で出力してください。以下の構造を守ってください：
-
-<div style="font-size: 15px; line-height: 1.8; color: #334155;">
-  <div style="margin-bottom: 25px;">
-    <h4 style="color: #1e40af; font-size: 18px; font-weight: 700; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 24px;">👥</span>顧客動向の気づき
-    </h4>
-    <ul style="margin: 0; padding-left: 20px; list-style: none;">
-      <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
-        <span style="position: absolute; left: 0;">•</span>
-        具体的な分析結果
-      </li>
-    </ul>
-  </div>
-  
-  <div style="margin-bottom: 25px;">
-    <h4 style="color: #1e40af; font-size: 18px; font-weight: 700; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 24px;">🛍️</span>商品・施術トレンド
-    </h4>
-    <ul style="margin: 0; padding-left: 20px; list-style: none;">
-      <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
-        <span style="position: absolute; left: 0;">•</span>
-        具体的な分析結果
-      </li>
-    </ul>
-  </div>
-  
-  <div style="margin-bottom: 25px;">
-    <h4 style="color: #1e40af; font-size: 18px; font-weight: 700; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 24px;">💎</span>売上貢献TOP顧客
-    </h4>
-    <ul style="margin: 0; padding-left: 20px; list-style: none;">
-      <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
-        <span style="position: absolute; left: 0;">•</span>
-        具体的な分析結果
-      </li>
-    </ul>
-  </div>
-  
-  <div>
-    <h4 style="color: #1e40af; font-size: 18px; font-weight: 700; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 24px;">💡</span>その他の気づき
-    </h4>
-    <ul style="margin: 0; padding-left: 20px; list-style: none;">
-      <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
-        <span style="position: absolute; left: 0;">•</span>
-        具体的な分析結果
-      </li>
-    </ul>
-  </div>
-</div>
-
-注意：
-- 顧客名や商品名は具体的に記載
-- 数値データを根拠にした分析
-- 実践的でアクショナブルなアドバイス
-- ポジティブな表現を心がける`;
-            
-            var requestBody = {
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.7,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: 2048
-                }
-            };
-            
-            var response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            });
-            
-            if (!response.ok) {
-                var errorData = await response.json();
-                throw new Error('APIエラー: ' + (errorData.error?.message || response.statusText));
-            }
-            
-            var result = await response.json();
-            var advice = result.candidates[0].content.parts[0].text;
-            
-            // HTMLタグをクリーンアップ（```htmlを削除）
-            advice = advice.replace(/```html\n?/g, '').replace(/```\n?/g, '');
-            
-            return advice;
-        }
-        
         window.onload = function() {
             console.log('ページ読み込み完了');
             
@@ -1510,36 +1220,12 @@ HTML形式で出力してください。以下の構造を守ってください�
             updateLocalDataCount();
             
             console.log('✅ システム初期化完了');
-            
-            // v13.17: AI経営アドバイスを自動生成（初回起動時、または朝8:00に更新）
-            setTimeout(function() {
-                generateAIAdvice();
-            }, 1000);
-            
-            // v13.17: 毎朝8:00にAIアドバイスを自動更新
-            setInterval(function() {
-                var now = new Date();
-                var hour = now.getHours();
-                var minute = now.getMinutes();
-                
-                // 朝8:00〜8:01の間に更新
-                if (hour === 8 && minute === 0) {
-                    var today = now.toDateString();
-                    var lastUpdate = lastAIAdviceUpdate ? lastAIAdviceUpdate.toDateString() : null;
-                    
-                    // 今日まだ更新していない場合のみ実行
-                    if (lastUpdate !== today) {
-                        console.log('🌅 朝8:00 - AIアドバイスを自動更新中...');
-                        generateAIAdvice();
-                    }
-                }
-            }, 60000); // 1分ごとにチェック
         };
 
         // 今日の日付を更新（v13.6.1で追加）
         function updateTodayDate() {
             var today = new Date();
-            var todayString = formatDateISO(today); // v13.17: タイムゾーン問題解決
+            var todayString = formatDateISO(today); // v13.18: タイムゾーン問題解決
             document.getElementById('sale-date').value = todayString;
             console.log('📅 今日の日付を更新:', todayString);
         }
@@ -1594,7 +1280,7 @@ HTML形式で出力してください。以下の構造を守ってください�
         
         // ダッシュボード期間を今日に更新（v13.6.1で追加）
         function updateDashboardPeriod() {
-            // v13.17: 年月単位で期間表示を更新
+            // v13.18: 年月単位で期間表示を更新
             var today = new Date();
             dashboardStartYear = today.getFullYear();
             dashboardStartMonth = today.getMonth() + 1;
@@ -1606,7 +1292,7 @@ HTML形式で出力してください。以下の構造を守ってください�
                 displayElement.textContent = dashboardStartYear + '年' + dashboardStartMonth + '月 〜 ' + dashboardEndYear + '年' + dashboardEndMonth + '月';
             }
             
-            // v13.17 A案: デートピッカーの初期値を設定
+            // v13.18 A案: デートピッカーの初期値を設定
             var startPeriod = dashboardStartYear + '-' + String(dashboardStartMonth).padStart(2, '0');
             var endPeriod = dashboardEndYear + '-' + String(dashboardEndMonth).padStart(2, '0');
             var startPicker = document.getElementById('dashboard-start-period');
@@ -1885,7 +1571,7 @@ HTML形式で出力してください。以下の構造を守ってください�
             return year + '年' + month + '月' + day + '日';
         }
         
-        // v13.17: 日付をYYYY-MM-DD形式に変換（タイムゾーン問題解決）
+        // v13.18: 日付をYYYY-MM-DD形式に変換（タイムゾーン問題解決）
         function formatDateISO(date) {
             var year = date.getFullYear();
             var month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1944,7 +1630,7 @@ HTML形式で出力してください。以下の構造を守ってください�
                 displayText = '先々月 (' + formatDate(start) + ' 〜 ' + formatDate(end) + ')';
             }
             
-            // v13.17: タイムゾーン問題解決 - toISOString()の代わりにformatDateISO()を使用
+            // v13.18: タイムゾーン問題解決 - toISOString()の代わりにformatDateISO()を使用
             listPeriodStart = formatDateISO(start);
             listPeriodEnd = formatDateISO(end);
             
@@ -2054,7 +1740,7 @@ HTML形式で出力してください。以下の構造を守ってください�
         // 日次・週次・月次集計
         function calculateDailyWeeklyMonthlySales() {
             var today = new Date();
-            var todayStr = formatDateISO(today); // v13.17: タイムゾーン問題解決
+            var todayStr = formatDateISO(today); // v13.18: タイムゾーン問題解決
             
             var todaySales = 0, todayCount = 0;
             var weekSales = 0, weekCount = 0;
@@ -2063,12 +1749,12 @@ HTML形式で出力してください。以下の構造を守ってください�
             var dayOfWeek = today.getDay();
             var weekStart = new Date(today);
             weekStart.setDate(today.getDate() - dayOfWeek);
-            var weekStartStr = formatDateISO(weekStart); // v13.17: タイムゾーン問題解決
+            var weekStartStr = formatDateISO(weekStart); // v13.18: タイムゾーン問題解決
             
             var monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            var monthStartStr = formatDateISO(monthStart); // v13.17: タイムゾーン問題解決
+            var monthStartStr = formatDateISO(monthStart); // v13.18: タイムゾーン問題解決
             
-            // v13.17: 取引件数 = 明細（items）の合計数
+            // v13.18: 取引件数 = 明細（items）の合計数
             for (var i = 0; i < salesData.length; i++) {
                 var sale = salesData[i];
                 var itemCount = (sale.items && sale.items.length > 0) ? sale.items.length : 0;
@@ -2500,13 +2186,13 @@ HTML形式で出力してください。以下の構造を守ってください�
         }
 
         // ダッシュボード表示
-        // ダッシュボード: グローバル変数（v13.17）
+        // ダッシュボード: グローバル変数（v13.18）
         var dashboardStartYear = new Date().getFullYear();
         var dashboardStartMonth = new Date().getMonth() + 1;
         var dashboardEndYear = new Date().getFullYear();
         var dashboardEndMonth = new Date().getMonth() + 1;
         
-        // v13.17: ランキング表示件数切り替え関数
+        // v13.18: ランキング表示件数切り替え関数
         function toggleRankingView(type, count) {
             rankingDisplayCount[type] = count;
             
@@ -2537,7 +2223,7 @@ HTML形式で出力してください。以下の構造を守ってください�
         }
 
         function renderDashboard() {
-            // v13.17: 開始年月〜終了年月で期間を計算
+            // v13.18: 開始年月〜終了年月で期間を計算
             var periodStart = dashboardStartYear + '-' + String(dashboardStartMonth).padStart(2, '0') + '-01';
             var lastDay = new Date(dashboardEndYear, dashboardEndMonth, 0).getDate();
             var periodEnd = dashboardEndYear + '-' + String(dashboardEndMonth).padStart(2, '0') + '-' + String(lastDay).padStart(2, '0');
@@ -2551,7 +2237,7 @@ HTML形式で出力してください。以下の構造を守ってください�
             });
             
             // 総売上・取引件数・平均取引額
-            // v13.17: 取引件数 = 明細（items）の合計数
+            // v13.18: 取引件数 = 明細（items）の合計数
             var totalSales = 0;
             var totalTransactions = 0;
             
@@ -2571,7 +2257,7 @@ HTML形式で出力してください。以下の構造を守ってください�
             document.getElementById('average-transaction').textContent = '¥' + averageTransaction.toLocaleString();
             
             
-            // v13.17: 顧客数と平均顧客単価を計算
+            // v13.18: 顧客数と平均顧客単価を計算
             var customerStats = {};
             for (var i = 0; i < filteredData.length; i++) {
                 var sale = filteredData[i];
@@ -2589,7 +2275,7 @@ HTML形式で出力してください。以下の構造を守ってください�
             
             console.log('📊 ダッシュボード指標:');
             console.log("📊 取引件数:", totalTransactions, "件 | 顧客数:", customerCount, "人 | ✅", totalTransactions >= customerCount ? "正常" : "異常");
-            // v13.17: 決済方法別分析強化版（前月比・前年同月比追加）
+            // v13.18: 決済方法別分析強化版（前月比・前年同月比追加）
             var paymentStats = {
                 '現金': { total: 0, count: 0 },
                 '振込': { total: 0, count: 0 },
@@ -2658,7 +2344,7 @@ HTML形式で出力してください。以下の構造を守ってください�
                 }
             }
             
-            // v13.17: マトリックス表を生成（前月比・前年同月比追加）
+            // v13.18: マトリックス表を生成（前月比・前年同月比追加）
             var matrixHTML = '';
             var paymentMethods = ['現金', '振込', 'クレジットカード'];
             var totalAllPayments = paymentStats['現金'].total + paymentStats['振込'].total + paymentStats['クレジットカード'].total;
@@ -2766,7 +2452,7 @@ HTML形式で出力してください。以下の構造を守ってください�
             }
             var categoryStats = {};
             
-            // v13.17: 凡例を生成
+            // v13.18: 凡例を生成
             var legendHTML = '';
             var paymentMethods = ['現金', '振込', 'クレジットカード'];
             var icons = ['💵', '🏦', '💳'];
@@ -2801,7 +2487,7 @@ HTML形式で出力してください。以下の構造を守ってください�
                 }
             }
             
-            // v13.17: カテゴリ別ランキング（TOP 5/10切り替え対応）
+            // v13.18: カテゴリ別ランキング（TOP 5/10切り替え対応）
             var categoryRanking = Object.keys(categoryStats).map(function(category) {
                 return {
                     name: category,
@@ -2845,7 +2531,7 @@ HTML形式で出力してください。以下の構造を守ってください�
                 }
             }
             
-            // v13.17: 商品別ランキング(TOP 5/10切り替え対応)
+            // v13.18: 商品別ランキング(TOP 5/10切り替え対応)
             var productRanking = Object.keys(productStats).map(function(product) {
                 return {
                     name: product,
@@ -2883,7 +2569,7 @@ HTML形式で出力してください。以下の構造を守ってください�
                 customerStats[sale.customerName].sales += sale.totalAmount;
             }
             
-            // v13.17: 顧客別ランキング(TOP 5/10切り替え対応)
+            // v13.18: 顧客別ランキング(TOP 5/10切り替え対応)
             var customerRanking = Object.keys(customerStats).map(function(customer) {
                 return {
                     name: customer,
@@ -2910,7 +2596,7 @@ HTML形式で出力してください。以下の構造を守ってください�
             }
             document.getElementById('customer-ranking').innerHTML = customerRankingHTML || '<div class="empty-state">データがありません</div>';
             
-            // v13.17: 日別売上改善版（トレンドグラフ + 前日比 + 移動平均）
+            // v13.18: 日別売上改善版（トレンドグラフ + 前日比 + 移動平均）
             var dailyStats = {};
             for (var i = 0; i < filteredData.length; i++) {
                 var sale = filteredData[i];
@@ -3095,7 +2781,7 @@ HTML形式で出力してください。以下の構造を守ってください�
                 dailyTableHTML || '<tr><td colspan="6" class="empty-state">データがありません</td></tr>';
         }
 
-        // v13.17: ダッシュボード期間選択パネルを開く/閉じる（A案: デートピッカー方式）
+        // v13.18: ダッシュボード期間選択パネルを開く/閉じる（A案: デートピッカー方式）
         function toggleDashboardPeriodSelector() {
             var panel = document.getElementById('dashboard-period-panel');
             var btn = document.getElementById('dashboard-period-btn');
@@ -3118,7 +2804,7 @@ HTML形式で出力してください。以下の構造を守ってください�
             }
         }
         
-        // v13.17: 期間選択時に表示を更新（A案: デートピッカー方式）
+        // v13.18: 期間選択時に表示を更新（A案: デートピッカー方式）
         function updateDashboardDisplay() {
             var startPeriod = document.getElementById('dashboard-start-period').value; // YYYY-MM形式
             var endPeriod = document.getElementById('dashboard-end-period').value; // YYYY-MM形式
@@ -3137,7 +2823,7 @@ HTML形式で出力してください。以下の構造を守ってください�
                 startYear + '年' + startMonth + '月 〜 ' + endYear + '年' + endMonth + '月';
         }
         
-        // v13.17: ダッシュボード期間を適用（A案: デートピッカー方式）
+        // v13.18: ダッシュボード期間を適用（A案: デートピッカー方式）
         function applyDashboardPeriod() {
             var startPeriod = document.getElementById('dashboard-start-period').value; // YYYY-MM形式
             var endPeriod = document.getElementById('dashboard-end-period').value; // YYYY-MM形式
