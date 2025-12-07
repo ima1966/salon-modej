@@ -1318,7 +1318,8 @@
         
         // v13.17: Gemini API呼び出し
         async function callGeminiAPI(analysisData) {
-            var apiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=' + geminiApiKey;
+            // v13.17: Gemini Proモデルを使用（無料プランで利用可能）
+            var apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + geminiApiKey;
             
             var prompt = `あなたはエステサロンの経営コンサルタントです。以下のデータを分析し、経営者に対して具体的で実践的なアドバイスを提供してください。
 
