@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サロン Mode J 売上管理システム v14.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- FontAwesome is nice for icons but user didn't have it. I'll stick to emojis if FA fails or just using emojis is safer. User used emojis. Stick to emojis for now to reduce dependencies issues. -->
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="header-content">
+                <h1>🌸 サロン Mode J 売上管理システム <span class="version-badge">v14.0</span></h1>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-tab="input">📝 売上入力</button>
+                <button class="nav-btn" data-tab="list">📊 売上一覧</button>
+                <button class="nav-btn" data-tab="dashboard">📈 ダッシュボード</button>
+                <button class="nav-btn" data-tab="settings">⚙️ 設定</button>
+            </nav>
+        </header>
+
+        <main class="content-area">
+            <!-- 売上入力タブ -->
+            <section id="input-tab" class="tab-content active">
+                <div class="card premium-card">
+                    <h2 class="section-title">📝 売上入力フォーム</h2>
+
+                    <form id="sales-form">
+                        <!-- お客様情報 -->
+                        <div class="form-section">
+                            <h3 class="subsection-title">👤 お客様情報</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="sale-date">月日 <span class="required">*</span></label>
+                                    <input type="date" id="sale-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-name">お客様名 <span class="required">*</span></label>
+                                    <input type="text" id="customer-name" placeholder="例: 山田様" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 商品・施術明細 -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h3 class="subsection-title">🛍️ 商品・施術明細</h3>
+                                <button type="button" class="btn-secondary btn-sm" id="add-item-btn">➕ 明細を追加</button>
+                            </div>
+                            <div id="items-container">
+                                <!-- JSで追加 -->
+                            </div>
+                        </div>
+
+                        <!-- 合計 & 決済 -->
+                        <div class="form-section total-payment-section">
+                            <div class="payment-area">
+                                <label>決済方法 <span class="required">*</span></label>
+                                <div class="payment-methods">
+                                    <div class="payment-option cash" data-value="現金">
+                                        <div class="icon">💵</div>
+                                        <span>現金</span>
+                                    </div>
+                                    <div class="payment-option transfer" data-value="振込">
+                                        <div class="icon">🏦</div>
+                                        <span>振込</span>
+                                    </div>
+                                    <div class="payment-option credit" data-value="クレジットカード">
+                                        <div class="icon">💳</div>
+                                        <span>カード</span>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="payment-method" required>
+                            </div>
+
+                            <div class="total-area">
+                                <span class="label">お支払い合計</span>
+                                <span class="amount" id="grand-total">¥0</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-lg btn-block" id="submit-btn">💾 売上を登録</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 売上一覧タブ -->
+            <section id="list-tab" class="tab-content">
+                <div class="card premium-card">
+                    <h2 class="section-title">📊 売上一覧管理</h2>
+
+                    <div class="filter-controls-container">
+                        <!-- Presets -->
+                        <div class="filter-group-row">
+                            <span class="filter-label">日次:</span>
+                            <div class="btn-group">
+                                <button class="btn-filter" data-period="today">本日</button>
+                                <button class="btn-filter" data-period="yesterday">昨日</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group-row">
+                            <span class="filter-label">週間/直近:</span>
+                            <div class="btn-group">
+                                <button class="btn-filter" data-period="this-week">今週</button>
+                                <button class="btn-filter" data-period="last-7-days">過去7日</button>
+                                <button class="btn-filter" data-period="last-30-days">過去30日</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group-row">
+                            <span class="filter-label">月次:</span>
+                            <div class="btn-group">
+                                <button class="btn-filter active" data-period="current-month"
+                                    id="period-current-month">今月</button>
+                                <button class="btn-filter" data-period="last-month">先月</button>
+                                <button class="btn-filter" data-period="2months-ago">先々月</button>
+                            </div>
+                        </div>
+
+                        <!-- Custom -->
+                        <div class="filter-group-row custom-row">
+                            <span class="filter-label">期間指定:</span>
+                            <div class="custom-period-inputs">
+                                <input type="date" id="list-period-start">
+                                <span class="range-sep">〜</span>
+                                <input type="date" id="list-period-end">
+                                <button class="btn-secondary btn-sm" id="apply-custom-period">適用</button>
+                                <button class="btn-ghost btn-sm" id="reset-list-period">クリア</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="period-indicator-large" id="current-period-display">現在の表示: 今月</div>
+
+                    <!-- 年間月次売上チャート -->
+                    <div class="chart-container-card">
+                        <div class="chart-header">
+                            <h3>📊 年間推移</h3>
+                            <select id="yearly-year-selector"></select>
+                        </div>
+                        <div class="chart-wrapper">
+                            <!-- Chart.js canvas -->
+                            <canvas id="yearlySalesChart"></canvas>
+                        </div>
+                        <div class="total-badge">年間合計: <span id="yearly-total">¥0</span></div>
+                    </div>
+
+                    <!-- 月間日次売上チャート -->
+                    <div class="chart-container-card">
+                        <div class="chart-header">
+                            <h3>📅 日次推移 <span id="monthly-display-period"></span></h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <!-- Chart.js canvas -->
+                            <canvas id="monthlyDailyChart"></canvas>
+                        </div>
+                        <div class="total-badge">月間合計: <span id="monthly-total">¥0</span> (<span
+                                id="monthly-count">0</span>件)</div>
+                    </div>
+
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="🔍 お客様名や商品名で検索...">
+                    </div>
+
+                    <div class="summary-cards-row">
+                        <div class="summary-card card-green">
+                            <div class="label">今日の売上</div>
+                            <div class="value" id="today-sales">¥0</div>
+                            <div class="sub" id="today-count">0件</div>
+                        </div>
+                        <div class="summary-card card-orange">
+                            <div class="label">今週の売上</div>
+                            <div class="value" id="week-sales">¥0</div>
+                            <div class="sub" id="week-count">0件</div>
+                        </div>
+                        <div class="summary-card card-blue">
+                            <div class="label">今月の売上</div>
+                            <div class="value" id="month-sales">¥0</div>
+                            <div class="sub" id="month-count">0件</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-secondary" onclick="exportToCSV()">📥 CSV出力</button>
+
+                    <div id="sales-list-container" class="table-responsive">
+                        <!-- Table injected by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ダッシュボードタブ -->
+            <section id="dashboard-tab" class="tab-content">
+                <div class="card premium-card">
+                    <h2 class="section-title">📈 経営ダッシュボード</h2>
+
+                    <div class="dashboard-period-control">
+                        <div class="current-range" id="dashboard-period-display">2025年12月 〜 2025年12月</div>
+                        <button class="btn-secondary" id="toggle-dashboard-period">📅 期間指定</button>
+                    </div>
+
+                    <div id="dashboard-period-panel" class="period-panel hidden">
+                        <div class="quick-period-buttons">
+                            <span class="label-sm">クイック選択:</span>
+                            <div class="button-group">
+                                <button class="btn-secondary btn-sm" data-quick="this-month">今月</button>
+                                <button class="btn-secondary btn-sm" data-quick="last-month">先月</button>
+                                <button class="btn-secondary btn-sm" data-quick="last-3-months">直近3ヶ月</button>
+                                <button class="btn-secondary btn-sm" data-quick="this-year">今年</button>
+                                <button class="btn-secondary btn-sm" data-quick="last-year">昨年</button>
+                            </div>
+                        </div>
+                        <div class="panel-grid">
+                            <div>
+                                <label>開始年月</label>
+                                <input type="month" id="dashboard-start-period">
+                            </div>
+                            <div>
+                                <label>終了年月</label>
+                                <input type="month" id="dashboard-end-period">
+                            </div>
+                        </div>
+                        <div class="panel-actions">
+                            <button class="btn-primary" id="apply-dashboard-period">適用</button>
+                            <button class="btn-ghost" id="cancel-dashboard-period">キャンセル</button>
+                        </div>
+                    </div>
+
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <h3>💰 総売上</h3>
+                            <div class="value" id="total-sales">¥0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <h3>📊 取引件数</h3>
+                            <div class="value" id="total-transactions">0件</div>
+                        </div>
+                        <div class="kpi-card">
+                            <h3>💵 平均取引額</h3>
+                            <div class="value" id="average-transaction">¥0</div>
+                        </div>
+                        <div class="kpi-card highlight-green">
+                            <h3>👥 顧客数</h3>
+                            <div class="value" id="customer-count">0人</div>
+                        </div>
+                        <div class="kpi-card highlight-orange">
+                            <h3>💳 平均顧客単価</h3>
+                            <div class="value" id="average-customer-spending">¥0</div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-subtitle">💳 決済方法別分析</h3>
+                    <div class="analysis-grid">
+                        <div class="matrix-container">
+                            <table class="styled-table matrix-table" id="payment-matrix-table">
+                                <thead>
+                                    <tr>
+                                        <th>決済方法</th>
+                                        <th class="text-right">合計金額</th>
+                                        <th class="text-right">件数</th>
+                                        <th class="text-right">構成比</th>
+                                        <th class="text-right">平均単価</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payment-matrix-body">
+                                    <!-- JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="chart-container-small">
+                            <h4>構成比</h4>
+                            <div class="chart-wrapper-circle">
+                                <canvas id="paymentPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ranking-section-header">
+                        <h2>🏆 ランキング TOP 10</h2>
+                    </div>
+
+                    <div class="rankings-grid">
+                        <!-- Category Ranking -->
+                        <div class="ranking-column">
+                            <div class="ranking-header">
+                                <h3>カテゴリー別</h3>
+                                <div class="toggle-group">
+                                    <button class="toggle-btn active" data-type="category" data-count="5">TOP 5</button>
+                                    <button class="toggle-btn" data-type="category" data-count="10">TOP 10</button>
+                                </div>
+                            </div>
+                            <div class="ranking-list" id="category-ranking"></div>
+                        </div>
+
+                        <!-- Product Ranking -->
+                        <div class="ranking-column">
+                            <div class="ranking-header">
+                                <h3>商品別</h3>
+                                <div class="toggle-group">
+                                    <button class="toggle-btn active" data-type="product" data-count="5">TOP 5</button>
+                                    <button class="toggle-btn" data-type="product" data-count="10">TOP 10</button>
+                                </div>
+                            </div>
+                            <div class="ranking-list" id="product-ranking"></div>
+                        </div>
+                    </div>
+
+                    <div class="ranking-column full-width">
+                        <div class="ranking-header">
+                            <h3>お客様別</h3>
+                            <div class="toggle-group">
+                                <button class="toggle-btn active" data-type="customer" data-count="5">TOP 5</button>
+                                <button class="toggle-btn" data-type="customer" data-count="10">TOP 10</button>
+                            </div>
+                        </div>
+                        <div class="ranking-list" id="customer-ranking"></div>
+                    </div>
+
+                    <div class="trend-section">
+                        <div class="trend-header">
+                            <h2>📅 <span id="daily-trend-title">日別売上トレンド</span></h2>
+                        </div>
+                        <div class="chart-wrapper-wide">
+                            <canvas id="dailySalesTrendChart"></canvas>
+                        </div>
+                        <div class="table-responsive mt-20">
+                            <table class="styled-table" id="daily-sales-table">
+                                <thead>
+                                    <tr>
+                                        <th>日付</th>
+                                        <th>曜日</th>
+                                        <th>売上</th>
+                                        <th>件数</th>
+                                        <th>前日比</th>
+                                        <th>7日平均</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 設定タブ -->
+            <section id="settings-tab" class="tab-content">
+                <div class="card premium-card">
+                    <h2 class="section-title">⚙️ システム設定</h2>
+
+                    <div class="settings-group">
+                        <h3>📊 Google Sheets 連携</h3>
+                        <div class="setting-item">
+                            <label>GAS URL</label>
+                            <div class="value code-font" id="gas-url-display"></div>
+                        </div>
+                        <div class="setting-item">
+                            <label>連携モード</label>
+                            <div class="value">CORS対応版 (no-cors)</div>
+                        </div>
+                        <button class="btn-primary" id="test-connection-btn">🔌 接続テスト</button>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>💾 データ管理</h3>
+                        <div class="setting-item">
+                            <label>保存済みデータ</label>
+                            <div class="value" id="local-data-count">0件</div>
+                        </div>
+                        <div class="setting-actions" style="display:flex; flex-direction:column; gap:10px;">
+                            <button class="btn-primary" id="download-sheets-btn">⬇️ Google Sheetsから復元 (上書き)</button>
+                            <button class="btn-secondary" id="import-sheets-btn">⬆️ Google Sheetsへインポート</button>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-danger" id="delete-all-btn" style="flex:1;">🗑️ Local削除</button>
+                                <button class="btn-danger" id="clear-cloud-btn" style="flex:1;">🔥 Cloud削除</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>ℹ️ システム情報</h3>
+                        <div class="setting-item">
+                            <label>バージョン</label>
+                            <div class="value">v14.0 (Antigravity Enhanced)</div>
+                        </div>
+                        <div class="setting-item">
+                            <label>最終更新</label>
+                            <div class="value">2025年12月08日</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <!-- app.js is main -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>
