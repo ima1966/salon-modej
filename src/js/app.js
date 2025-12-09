@@ -479,9 +479,16 @@ function renderSalesList() {
                         ${sale.items.map(i => {
             const isMan = i.isManager ? '<span title="店長担当" style="margin-right:2px; cursor:help;">👑</span>' : '';
             return `
-                                <div class="sale-item-line">
-                                    <span>${isMan}${i.productName} x${i.quantity}</span>
-                                    <span>¥${i.subtotal.toLocaleString()}</span>
+                                <div class="sale-item-line" style="align-items: center; justify-content: space-between;">
+                                    <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                                        <span style="font-size:0.75rem; color:#6b7280;">${i.category}</span>
+                                        <div style="display:flex; align-items:center;">
+                                            ${isMan}
+                                            <span style="font-weight:500;">${i.productName}</span>
+                                            <span style="margin-left:4px; font-size:0.85rem; color:#6b7280;">x${i.quantity}</span>
+                                        </div>
+                                    </div>
+                                    <span style="font-weight:bold; color:#374151;">¥${i.subtotal.toLocaleString()}</span>
                                 </div>
                             `;
         }).join('')}
