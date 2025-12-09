@@ -4,7 +4,7 @@
  */
 
 // --- Constants & Config ---
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx3u8GTrk1qNXqNhe7VWjWo7wsGNXsaC_YsgSj9vhOLj0yfq7VVGTP1avLSAllyygqF/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFh1F0aQ4QSCW5mTrE4RDeIExM9qxoYmI1V4haeSVSYmqn9bjUNdopgF5kAj8sOKax/exec';
 const STORAGE_KEY = 'salonSalesData';
 
 // --- State ---
@@ -155,7 +155,12 @@ window.addItemRow = function () {
 
     row.innerHTML = `
         <div class="item-header">
-            <span>#${itemCounter}</span>
+            <div style="display:flex; align-items:center;">
+                <span>#${itemCounter}</span>
+                <label class="manager-check-label" title="店長担当">
+                    <input type="checkbox" class="item-is-manager"> 👑
+                </label>
+            </div>
             <button type="button" class="btn-remove" onclick="removeItemRow(${itemCounter})">🗑️</button>
         </div>
         <div class="item-grid-row">
@@ -242,6 +247,8 @@ function handleFormSubmit(e) {
             showNotification('入力不備があります', 'error'); return;
         }
 
+        const isManager = row.querySelector('.item-is-manager').checked;
+
         const sub = qty * price;
         totalAmount += sub;
 
@@ -250,7 +257,8 @@ function handleFormSubmit(e) {
             productName: prod,
             quantity: qty,
             unitPrice: price,
-            subtotal: sub
+            subtotal: sub,
+            isManager: isManager
         });
     }
 
@@ -382,9 +390,15 @@ function applyCustomPeriod() {
         document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
         document.getElementById('current-period-display').innerText = `期間: ${s} 〜 ${e}`;
         renderSalesList();
-        // Charts use start date's month
-        const sd = new Date(s);
-        renderCharts(sd.getFullYear(), sd.getMonth());
+
+        // Charts: Use the END date of the range to show the most recent relevant data
+        // instead of the start date which might be far in the past (e.g. 2024 in a 2024-2025 range)
+        const ed = new Date(e);
+        renderCharts(ed.getFullYear(), ed.getMonth());
+
+        // Also update the dropdown to match
+        const yearSelector = document.getElementById('yearly-year-selector');
+        if (yearSelector) yearSelector.value = ed.getFullYear();
     }
 }
 
@@ -457,6 +471,21 @@ function renderSalesList() {
                 <td>
                     <button class="btn-secondary btn-sm" onclick="editSale('${sale.id}')">編集</button>
                     <button class="btn-danger btn-sm" onclick="deleteSale('${sale.id}')">削除</button>
+                </td>
+            </tr>
+            <tr class="detail-row">
+                <td colspan="5">
+                    <div class="sale-details-list">
+                        ${sale.items.map(i => {
+            const isMan = i.isManager ? '<span title="店長担当" style="margin-right:2px; cursor:help;">👑</span>' : '';
+            return `
+                                <div class="sale-item-line">
+                                    <span>${isMan}${i.productName} x${i.quantity}</span>
+                                    <span>¥${i.subtotal.toLocaleString()}</span>
+                                </div>
+                            `;
+        }).join('')}
+                    </div>
                 </td>
             </tr>
         `;
