@@ -462,6 +462,20 @@ function renderSalesList() {
     </tr></thead><tbody>`;
 
     filtered.forEach(sale => {
+        // Details HTML for Tooltip
+        const detailsHtml = sale.items.map(i => {
+            const isMan = i.isManager ? '<span title="店長担当">👑</span>' : '';
+            return `
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed #eee; padding-bottom:4px;">
+                    <div style="display:flex; flex-direction:column; line-height:1.2;">
+                        <span style="font-size:0.7rem; color:#888;">${i.category}</span>
+                        <span style="font-size:0.85rem; font-weight:600; color:#333;">${isMan}${i.productName} x${i.quantity}</span>
+                    </div>
+                    <span style="font-size:0.85rem;">¥${i.subtotal.toLocaleString()}</span>
+                </div>
+            `;
+        }).join('');
+
         html += `
             <tr>
                 <td>${sale.date}</td>
@@ -469,29 +483,17 @@ function renderSalesList() {
                 <td class="text-right" style="font-weight:700">¥${sale.totalAmount.toLocaleString()}</td>
                 <td><span class="badge-${sale.paymentMethod}">${sale.paymentMethod}</span></td>
                 <td>
-                    <button class="btn-secondary btn-sm" onclick="editSale('${sale.id}')">編集</button>
-                    <button class="btn-danger btn-sm" onclick="deleteSale('${sale.id}')">削除</button>
-                </td>
-            </tr>
-            <tr class="detail-row">
-                <td colspan="5">
-                    <div class="sale-details-list">
-                        ${sale.items.map(i => {
-            const isMan = i.isManager ? '<span title="店長担当" style="margin-right:2px; cursor:help;">👑</span>' : '';
-            return `
-                                <div class="sale-item-line" style="align-items: center; justify-content: space-between;">
-                                    <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                                        <span style="font-size:0.75rem; color:#6b7280;">${i.category}</span>
-                                        <div style="display:flex; align-items:center;">
-                                            ${isMan}
-                                            <span style="font-weight:500;">${i.productName}</span>
-                                            <span style="margin-left:4px; font-size:0.85rem; color:#6b7280;">x${i.quantity}</span>
-                                        </div>
-                                    </div>
-                                    <span style="font-weight:bold; color:#374151;">¥${i.subtotal.toLocaleString()}</span>
-                                </div>
-                            `;
-        }).join('')}
+                    <div class="op-btn-group">
+                        <div class="detail-wrapper">
+                            <button class="btn-secondary btn-sm" style="background:#e0e7ff; color:#4f46e5; border:none;" onclick="void(0)">📄 明細</button>
+                            <div class="detail-tooltip">
+                                <div style="font-size:0.8rem; font-weight:bold; margin-bottom:8px; border-bottom:1px solid #ddd; padding-bottom:4px; color:#555;">明細 (${sale.items.length}点)</div>
+                                ${detailsHtml}
+                                <div style="text-align:right; font-weight:bold; font-size:0.9rem; margin-top:8px; color:#4f46e5;">合計: ¥${sale.totalAmount.toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <button class="btn-secondary btn-sm" onclick="editSale('${sale.id}')">編集</button>
+                        <button class="btn-danger btn-sm" onclick="deleteSale('${sale.id}')">削除</button>
                     </div>
                 </td>
             </tr>

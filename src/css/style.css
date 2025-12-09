@@ -578,7 +578,56 @@ select:focus {
     border-left-color: var(--accent-color);
 }
 
-/* Summaries (List Tab) */
+/* Detail Tooltip */
+.detail-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.detail-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    right: 110%;
+    /* Show to the left of the button */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 280px;
+    background: white;
+    border: 1px solid #e1e7ef;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+    z-index: 50;
+    border-radius: 8px;
+    transition: opacity 0.2s, visibility 0.2s;
+    pointer-events: none;
+    /* Prevent flickering */
+    text-align: left;
+}
+
+.detail-wrapper:hover .detail-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Tooltip Arrow */
+.detail-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent transparent white;
+}
+
+.op-btn-group {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
 .summary-cards-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
