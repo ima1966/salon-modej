@@ -11,6 +11,7 @@ const STORAGE_KEY = 'salonSalesData';
 let salesData = [];
 let editingId = null;
 let itemCounter = 0;
+let editItemCounter = 0;
 
 // Chart Instances
 let charts = {
@@ -52,7 +53,11 @@ function initUI() {
     // 1. Navigation (Tabs)
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            switchTab(e.target.dataset.tab);
+            const tab = e.target.dataset.tab;
+            if (tab === 'input') {
+                resetForm();
+            }
+            switchTab(tab);
         });
     });
 
@@ -82,6 +87,11 @@ function initUI() {
         btn.addEventListener('click', (e) => applyPeriodFilter(btn.dataset.period));
     });
     document.getElementById('apply-custom-period').addEventListener('click', applyCustomPeriod);
+    document.getElementById('reset-list-period').addEventListener('click', () => {
+        document.getElementById('list-period-start').value = '';
+        document.getElementById('list-period-end').value = '';
+        applyPeriodFilter('current-month');
+    });
 
     // 7. Search
     document.getElementById('search-input').addEventListener('input', renderSalesList);
@@ -134,6 +144,17 @@ function initUI() {
 
     // Default Filters
     applyPeriodFilter('current-month', true);
+
+    // Edit Form Listeners
+    document.getElementById('add-edit-item-btn').addEventListener('click', addEditItemRow);
+    document.getElementById('edit-sales-form').addEventListener('submit', handleEditSubmit);
+    document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+        document.getElementById('sales-edit-view').classList.add('hidden');
+        document.getElementById('sales-list-view').classList.remove('hidden');
+    });
+    document.querySelectorAll('.edit-payment-option').forEach(opt => {
+        opt.addEventListener('click', () => selectEditPaymentMethod(opt));
+    });
 }
 
 window.switchTab = function (tabId) {
@@ -230,6 +251,12 @@ function handleFormSubmit(e) {
     const name = document.getElementById('customer-name').value;
     const payment = document.getElementById('payment-method').value;
 
+    // Validation: Comma Check
+    if (name.includes(',')) {
+        showNotification('お客様名にカンマ(,)は使用できません', 'error');
+        return;
+    }
+
     if (!payment) { showNotification('決済方法を選択してください', 'error'); return; }
 
     // Collect Items
@@ -245,6 +272,11 @@ function handleFormSubmit(e) {
 
         if (!cat || !prod || !qty || isNaN(price)) {
             showNotification('入力不備があります', 'error'); return;
+        }
+
+        if (prod.includes(',')) {
+            showNotification('商品名にカンマ(,)は使用できません', 'error');
+            return;
         }
 
         const isManager = row.querySelector('.item-is-manager').checked;
@@ -295,6 +327,8 @@ function handleFormSubmit(e) {
 }
 
 function resetForm() {
+    editingId = null;
+    document.getElementById('submit-btn').textContent = '💾 売上を登録';
     document.getElementById('sales-form').reset();
     document.getElementById('items-container').innerHTML = '';
     document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
@@ -308,6 +342,160 @@ function resetForm() {
 
     addItemRow();
     window.updateTotal();
+}
+
+// --- Logic: Edit Form (Isolated) ---
+window.addEditItemRow = function () {
+    editItemCounter++;
+    const container = document.getElementById('edit-items-container');
+    const row = document.createElement('div');
+    row.className = 'item-row edit-item-row';
+    row.id = `edit-item-row-${editItemCounter}`;
+
+    row.innerHTML = `
+        <div class="item-header">
+            <div style="display:flex; align-items:center;">
+                <span>#${editItemCounter}</span>
+                <label class="manager-check-label" title="店長担当">
+                    <input type="checkbox" class="item-is-manager"> 👑
+                </label>
+            </div>
+            <button type="button" class="btn-remove" onclick="removeEditItemRow(${editItemCounter})">🗑️</button>
+        </div>
+        <div class="item-grid-row">
+            <div class="form-group">
+                <select class="item-category" onchange="updateEditTotal()" required>
+                    <option value="">カテゴリー選択</option>
+                    <option value="サブスクリプション">サブスク</option>
+                    <option value="会員 若よもぎ蒸し">会員 よもぎ</option>
+                    <option value="非会員 若よもぎ蒸し">非会員 よもぎ</option>
+                    <option value="施術">施術</option>
+                    <option value="ベルマン">ベルマン</option>
+                    <option value="クレンシア">クレンシア</option>
+                    <option value="水素関連">水素関連</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" class="item-product" placeholder="商品名" required>
+            </div>
+            <div class="form-group">
+                <input type="number" class="item-qty" placeholder="個数" min="1" value="1" oninput="updateEditTotal()" required>
+            </div>
+            <div class="form-group">
+                <input type="number" class="item-price" placeholder="単価" min="0" oninput="updateEditTotal()" required>
+            </div>
+            <div class="form-group">
+                <input type="text" class="item-subtotal" value="¥0" readonly style="background:#f3f4f6; text-align:right;">
+            </div>
+        </div>
+    `;
+    container.appendChild(row);
+}
+
+window.removeEditItemRow = function (id) {
+    const row = document.getElementById(`edit-item-row-${id}`);
+    if (document.querySelectorAll('.edit-item-row').length > 1) {
+        row.remove();
+        window.updateEditTotal();
+    } else {
+        showNotification('明細は1つ以上必要です', 'error');
+    }
+}
+
+window.updateEditTotal = function () {
+    let total = 0;
+    document.querySelectorAll('.edit-item-row').forEach(row => {
+        const qty = parseInt(row.querySelector('.item-qty').value) || 0;
+        const price = parseInt(row.querySelector('.item-price').value) || 0;
+        const sub = qty * price;
+        total += sub;
+        row.querySelector('.item-subtotal').value = '¥' + sub.toLocaleString();
+    });
+    document.getElementById('edit-grand-total').textContent = '¥' + total.toLocaleString();
+}
+
+function selectEditPaymentMethod(element) {
+    document.querySelectorAll('.edit-payment-option').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    document.getElementById('edit-payment-method').value = element.dataset.value;
+}
+
+function handleEditSubmit(e) {
+    e.preventDefault();
+
+    const date = document.getElementById('edit-sale-date').value;
+    const name = document.getElementById('edit-customer-name').value;
+    const payment = document.getElementById('edit-payment-method').value;
+
+    // Validation: Comma Check
+    if (name.includes(',')) {
+        showNotification('お客様名にカンマ(,)は使用できません', 'error');
+        return;
+    }
+
+    if (!payment) { showNotification('決済方法を選択してください', 'error'); return; }
+
+    let items = [];
+    let totalAmount = 0;
+
+    const rows = document.querySelectorAll('.edit-item-row');
+    for (let row of rows) {
+        const cat = row.querySelector('.item-category').value;
+        const prod = row.querySelector('.item-product').value;
+        const qty = parseInt(row.querySelector('.item-qty').value);
+        const price = parseInt(row.querySelector('.item-price').value);
+
+        if (!cat || !prod || !qty || isNaN(price)) {
+            showNotification('入力不備があります', 'error'); return;
+        }
+
+        if (prod.includes(',')) {
+            showNotification('商品名にカンマ(,)は使用できません', 'error');
+            return;
+        }
+
+        const isManager = row.querySelector('.item-is-manager').checked;
+        const sub = qty * price;
+        totalAmount += sub;
+
+        items.push({
+            category: cat,
+            productName: prod,
+            quantity: qty,
+            unitPrice: price,
+            subtotal: sub,
+            isManager: isManager
+        });
+    }
+
+    const updatedSale = {
+        id: editingId,
+        date: date,
+        customerName: name,
+        paymentMethod: payment,
+        items: items,
+        totalAmount: totalAmount,
+        createdAt: salesData.find(s => s.id === editingId)?.createdAt || new Date().toISOString()
+    };
+
+    const idx = salesData.findIndex(s => s.id === editingId);
+    if (idx !== -1) salesData[idx] = updatedSale;
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
+    sendToGoogleSheets(updatedSale);
+
+    showNotification('変更を保存しました');
+
+    // Return to List View
+    document.getElementById('sales-edit-view').classList.add('hidden');
+    document.getElementById('sales-list-view').classList.remove('hidden');
+    editingId = null;
+
+    // Refresh List
+    renderSalesList();
+    renderCharts(new Date(date).getFullYear(), new Date(date).getMonth());
+    updateDashboard();
 }
 
 // --- Logic: List Filters & Table ---
@@ -1128,29 +1316,33 @@ window.editSale = function (id) {
     const s = salesData.find(d => d.id === id);
     if (s) {
         editingId = id;
-        document.getElementById('submit-btn').textContent = '💾 変更を保存';
 
-        document.getElementById('sale-date').value = s.date;
-        document.getElementById('customer-name').value = s.customerName;
+        // Populate Edit Form
+        document.getElementById('edit-sale-date').value = s.date;
+        document.getElementById('edit-customer-name').value = s.customerName;
 
-        document.querySelectorAll('.payment-option').forEach(el => {
-            if (el.dataset.value === s.paymentMethod) selectPaymentMethod(el);
+        document.querySelectorAll('.edit-payment-option').forEach(el => el.classList.remove('selected'));
+        document.querySelectorAll('.edit-payment-option').forEach(el => {
+            if (el.dataset.value === s.paymentMethod) selectEditPaymentMethod(el);
         });
 
-        document.getElementById('items-container').innerHTML = '';
-        itemCounter = 0;
+        document.getElementById('edit-items-container').innerHTML = '';
+        editItemCounter = 0;
         s.items.forEach(item => {
-            addItemRow();
-            const row = document.getElementById(`item-row-${itemCounter}`);
+            window.addEditItemRow();
+            const row = document.getElementById(`edit-item-row-${editItemCounter}`);
             row.querySelector('.item-category').value = item.category;
             row.querySelector('.item-product').value = item.productName;
             row.querySelector('.item-qty').value = item.quantity;
             row.querySelector('.item-price').value = item.unitPrice;
+            row.querySelector('.item-is-manager').checked = item.isManager || false;
         });
-        window.updateTotal();
+        window.updateEditTotal();
 
-        switchTab('input');
-        showNotification('編集モード: 修正して保存してください');
+        // Switch Views (In-Tab)
+        document.getElementById('sales-list-view').classList.add('hidden');
+        document.getElementById('sales-edit-view').classList.remove('hidden');
+
     } else {
         console.error('Sale not found:', id);
         showNotification('データが見つかりません', 'error');
