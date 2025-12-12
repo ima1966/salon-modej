@@ -329,8 +329,16 @@ function handleFormSubmit(e) {
 function resetForm() {
     editingId = null;
     document.getElementById('submit-btn').textContent = '💾 売上を登録';
+
+    // Explicitly reset form and clear key fields
     document.getElementById('sales-form').reset();
-    document.getElementById('items-container').innerHTML = '';
+    document.getElementById('customer-name').value = '';
+
+    // Clear items safely
+    const container = document.getElementById('items-container');
+    container.innerHTML = '';
+    itemCounter = 0;
+
     document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
     document.getElementById('payment-method').value = '';
 
