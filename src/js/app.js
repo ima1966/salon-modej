@@ -339,6 +339,9 @@ function resetForm() {
     container.innerHTML = '';
     itemCounter = 0;
 
+    // Explicitly clear total display
+    document.getElementById('grand-total').textContent = '¥0';
+
     document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
     document.getElementById('payment-method').value = '';
 
