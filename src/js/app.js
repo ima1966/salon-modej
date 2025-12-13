@@ -566,16 +566,36 @@ function applyPeriodFilter(period, silent = false) {
         const y = d.getFullYear();
         const m = d.getMonth() + 1;
         const dy = d.getDate();
-        // Add day of week
         const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][d.getDay()];
         displayText = `${y}年${m}月${dy}日 (${dayOfWeek})`;
+        // For monthly chart title, just show month
+        document.getElementById('monthly-display-period').innerText = `(${y}年${m}月)`;
     } else if (currentFilter.start && currentFilter.end) {
-        displayText = `${currentFilter.start} 〜 ${currentFilter.end}`;
+        // Attempt to detect if it's a full month range for cleaner display
+        const s = new Date(currentFilter.start);
+        const e = new Date(currentFilter.end);
+
+        // If starts on 1st and ends on last day of same month
+        const isFullMonth = s.getDate() === 1 &&
+            e.getMonth() === s.getMonth() &&
+            e.getFullYear() === s.getFullYear() &&
+            e.getDate() === new Date(s.getFullYear(), s.getMonth() + 1, 0).getDate();
+
+        if (isFullMonth) {
+            displayText = `${s.getFullYear()}年${s.getMonth() + 1}月`;
+            document.getElementById('monthly-display-period').innerText = `(${s.getFullYear()}年${s.getMonth() + 1}月)`;
+        } else {
+            displayText = `${currentFilter.start} 〜 ${currentFilter.end}`;
+            // Even for custom ranges, try to show relevant month in daily chart title if close enough
+            // Default to showing the month of the start date
+            document.getElementById('monthly-display-period').innerText = `(${s.getFullYear()}年${s.getMonth() + 1}月)`;
+        }
     } else {
         displayText = '全期間';
+        document.getElementById('monthly-display-period').innerText = '';
     }
+
     document.getElementById('current-period-display').innerText = `現在の表示: ${displayText}`;
-    document.getElementById('monthly-display-period').innerText = `(${displayText})`;
 
     if (!silent) renderSalesList();
     if (!silent) renderCharts(start ? start.getFullYear() : now.getFullYear(), start ? start.getMonth() : now.getMonth());
@@ -736,7 +756,27 @@ function initCharts() {
     charts.yearly = new Chart(ctxYear, {
         type: 'bar',
         data: { labels: [], datasets: [{ label: '売上', data: [], backgroundColor: '#667eea', borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index; // Month index 0-11
+                    const yearVal = document.getElementById('yearly-year-selector').value;
+                    const year = yearVal ? parseInt(yearVal) : new Date().getFullYear();
+
+                    // Render Daily Chart for selected month
+                    renderCharts(year, index);
+
+                    // Update display text
+                    document.getElementById('monthly-display-period').innerText = `(${year}年${index + 1}月)`;
+                }
+            },
+            onHover: (event, chartElement) => {
+                event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+            }
+        }
     });
 
     const ctxMonth = document.getElementById('monthlyDailyChart').getContext('2d');
