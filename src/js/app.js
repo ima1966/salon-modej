@@ -1078,19 +1078,31 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     // Trend Chart (Daily)
     const chartDates = Object.keys(dailyMap).sort();
 
+
+
     // Calculate Moving Average & Diffs
     const dailyDataObj = chartDates.map((date, idx) => {
         const sales = dailyMap[date];
         const count = dailyCountMap[date];
         const customerCount = dailyCustomerMap[date] ? dailyCustomerMap[date].size : 0;
 
-        let sum = 0;
-        let c = 0;
+        // 7-day Moving Average
+        let sum7 = 0;
+        let c7 = 0;
         for (let j = Math.max(0, idx - 6); j <= idx; j++) {
-            sum += dailyMap[chartDates[j]];
-            c++;
+            sum7 += dailyMap[chartDates[j]];
+            c7++;
         }
-        const movAvg = Math.floor(sum / c);
+        const movAvg7 = Math.floor(sum7 / c7);
+
+        // 30-day Moving Average
+        let sum30 = 0;
+        let c30 = 0;
+        for (let j = Math.max(0, idx - 29); j <= idx; j++) {
+            sum30 += dailyMap[chartDates[j]];
+            c30++;
+        }
+        const movAvg30 = Math.floor(sum30 / c30);
 
         // Prev diff
         let diffPct = 0;
@@ -1103,12 +1115,17 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
             hasPrev = true;
         }
 
-        return { date, sales, count, customerCount, movAvg, diffVal, diffPct, hasPrev };
+        return { date, sales, count, customerCount, movAvg7, movAvg30, diffVal, diffPct, hasPrev };
     });
 
     // Chart Update
     if (charts.dailyTrend) {
         charts.dailyTrend.data.labels = chartDates;
+
+        // Ensure we have two datasets in chart configuration, if not, we might need to re-init chart or just update first one.
+        // For now, simpler to just update the existing one (Sales Trend).
+        // If user wants to see moving average ON THE CHART, we would add another dataset.
+        // For this request, user asked to addition "To the right of 7-day average", implying the Table.
         charts.dailyTrend.data.datasets[0].data = dailyDataObj.map(d => d.sales);
         charts.dailyTrend.update();
     }
@@ -1139,6 +1156,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
                 <th class="sortable text-right" onclick="sortDashboard('count')" style="cursor:pointer">件数 ${getIcon('count')}</th>
                 <th class="text-right">前日比</th>
                 <th class="text-right">7日平均</th>
+                <th class="text-right">30日平均</th>
             </tr>
         </thead>
         <tbody>`;
@@ -1168,7 +1186,8 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
                 <td class="text-right">${day.customerCount}人</td>
                 <td class="text-right">${day.count}件</td>
                 <td class="text-right">${diffHtml}</td>
-                <td class="text-right" style="color:#f59e0b; font-weight:600">¥${day.movAvg.toLocaleString()}</td>
+                <td class="text-right" style="color:#f59e0b; font-weight:600">¥${day.movAvg7.toLocaleString()}</td>
+                <td class="text-right" style="color:#3b82f6; font-weight:600">¥${day.movAvg30.toLocaleString()}</td>
             </tr>
             `;
     });
