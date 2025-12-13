@@ -55,7 +55,7 @@ function initUI() {
         btn.addEventListener('click', (e) => {
             const tab = e.target.dataset.tab;
             if (tab === 'input') {
-                resetForm();
+                setTimeout(() => resetForm(), 50);
             }
             switchTab(tab);
         });
@@ -199,13 +199,13 @@ window.addItemRow = function () {
                 </select>
             </div>
             <div class="form-group">
-                <input type="text" class="item-product" placeholder="商品名" required>
+                <input type="text" class="item-product" placeholder="商品名" required autocomplete="off">
             </div>
             <div class="form-group">
-                <input type="number" class="item-qty" placeholder="個数" min="1" value="1" oninput="updateTotal()" required>
+                <input type="number" class="item-qty" placeholder="個数" min="1" value="1" oninput="updateTotal()" required autocomplete="off">
             </div>
             <div class="form-group">
-                <input type="number" class="item-price" placeholder="単価" min="0" oninput="updateTotal()" required>
+                <input type="number" class="item-price" placeholder="単価" min="0" oninput="updateTotal()" required autocomplete="off">
             </div>
             <div class="form-group">
                 <input type="text" class="item-subtotal" value="¥0" readonly style="background:#f3f4f6; text-align:right;">
@@ -388,13 +388,13 @@ window.addEditItemRow = function () {
                 </select>
             </div>
             <div class="form-group">
-                <input type="text" class="item-product" placeholder="商品名" required>
+                <input type="text" class="item-product" placeholder="商品名" required autocomplete="off">
             </div>
             <div class="form-group">
-                <input type="number" class="item-qty" placeholder="個数" min="1" value="1" oninput="updateEditTotal()" required>
+                <input type="number" class="item-qty" placeholder="個数" min="1" value="1" oninput="updateEditTotal()" required autocomplete="off">
             </div>
             <div class="form-group">
-                <input type="number" class="item-price" placeholder="単価" min="0" oninput="updateEditTotal()" required>
+                <input type="number" class="item-price" placeholder="単価" min="0" oninput="updateEditTotal()" required autocomplete="off">
             </div>
             <div class="form-group">
                 <input type="text" class="item-subtotal" value="¥0" readonly style="background:#f3f4f6; text-align:right;">
