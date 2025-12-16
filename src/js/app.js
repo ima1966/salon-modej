@@ -55,7 +55,7 @@ function initUI() {
         btn.addEventListener('click', (e) => {
             const tab = e.target.dataset.tab;
             if (tab === 'input') {
-                setTimeout(() => resetForm(), 50);
+                resetForm();
             }
             switchTab(tab);
         });
@@ -364,6 +364,9 @@ function resetForm() {
 
     // Reset total using update method to ensure UI consistency
     window.updateTotal();
+
+    // 🔴 Final Safety Force Zero: Ensure visual display is ¥0 regardless of calculation artifacts
+    document.getElementById('grand-total').textContent = '¥0';
 }
 
 // --- Logic: Edit Form (Isolated) ---
