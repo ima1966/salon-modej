@@ -202,7 +202,7 @@ window.addItemRow = function () {
                 <input type="text" class="item-product" placeholder="商品名" required autocomplete="off">
             </div>
             <div class="form-group">
-                <input type="number" class="item-qty" placeholder="個数" min="1" value="1" oninput="updateTotal()" required autocomplete="off">
+                <input type="number" class="item-qty" placeholder="個数" min="1" value="" oninput="updateTotal()" required autocomplete="off">
             </div>
             <div class="form-group">
                 <input type="number" class="item-price" placeholder="単価" min="0" oninput="updateTotal()" required autocomplete="off">
@@ -351,7 +351,18 @@ function resetForm() {
     const d = String(now.getDate()).padStart(2, '0');
     document.getElementById('sale-date').value = `${y}-${m}-${d}`;
 
+    // Add one empty row
     addItemRow();
+
+    // Force clear inputs in the newly added row to be absolutely sure
+    const firstRowInputs = document.querySelectorAll('#items-container .item-row input');
+    firstRowInputs.forEach(input => {
+        if (input.type === 'text' || input.type === 'number') {
+            input.value = '';
+        }
+    });
+
+    // Reset total using update method to ensure UI consistency
     window.updateTotal();
 }
 
@@ -391,7 +402,7 @@ window.addEditItemRow = function () {
                 <input type="text" class="item-product" placeholder="商品名" required autocomplete="off">
             </div>
             <div class="form-group">
-                <input type="number" class="item-qty" placeholder="個数" min="1" value="1" oninput="updateEditTotal()" required autocomplete="off">
+                <input type="number" class="item-qty" placeholder="個数" min="1" value="" oninput="updateEditTotal()" required autocomplete="off">
             </div>
             <div class="form-group">
                 <input type="number" class="item-price" placeholder="単価" min="0" oninput="updateEditTotal()" required autocomplete="off">
