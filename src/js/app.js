@@ -1,10 +1,10 @@
 /**
- * サロン Mode J 売上管理システム v14.0
+ * サロン Mode J 売上管理システム v14.1
  * Antigravity Refactored Version
  */
 
 // --- Constants & Config ---
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFh1F0aQ4QSCW5mTrE4RDeIExM9qxoYmI1V4haeSVSYmqn9bjUNdopgF5kAj8sOKax/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwAaTNKwE6RvKUqp2ghLXIOZcRnQxPxu6DvmR-eEsUUwCP0PPDDGflMqVsLi7cZPZmT/exec';
 const STORAGE_KEY = 'salonSalesData';
 
 // --- State ---
@@ -1055,6 +1055,63 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
         if (!dailyCustomerMap[s.date]) dailyCustomerMap[s.date] = new Set();
         dailyCustomerMap[s.date].add(s.customerName);
     });
+
+    // --- Manager Stats Logic (Added v14.1) ---
+    let managerTotalSales = 0;
+    let managerCustomers = new Set();
+    let managerCategoryStats = {};
+
+    data.forEach(s => {
+        let hasManagerItem = false;
+        s.items.forEach(item => {
+            if (item.isManager) {
+                const sub = item.subtotal || 0;
+                managerTotalSales += sub;
+                hasManagerItem = true;
+
+                // Category Stats
+                if (!managerCategoryStats[item.category]) {
+                    managerCategoryStats[item.category] = { sales: 0, count: 0 };
+                }
+                managerCategoryStats[item.category].sales += sub;
+                managerCategoryStats[item.category].count += (item.quantity || 0);
+            }
+        });
+
+        if (hasManagerItem) {
+            managerCustomers.add(s.customerName);
+        }
+    });
+
+    // Update Manager UI
+    const mgrSalesEl = document.getElementById('manager-total-sales');
+    if (mgrSalesEl) mgrSalesEl.textContent = '¥' + managerTotalSales.toLocaleString();
+
+    const mgrCustEl = document.getElementById('manager-customer-count');
+    if (mgrCustEl) mgrCustEl.textContent = managerCustomers.size + '人';
+
+    const mgrCatBody = document.getElementById('manager-category-body');
+    if (mgrCatBody) {
+        const sortedCats = Object.entries(managerCategoryStats)
+            .map(([key, val]) => ({ name: key, ...val }))
+            .sort((a, b) => b.sales - a.sales);
+
+        if (sortedCats.length === 0) {
+            mgrCatBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999; padding:20px;">データなし</td></tr>';
+        } else {
+            let html = '';
+            sortedCats.forEach(c => {
+                html += `
+                    <tr>
+                        <td>${c.name}</td>
+                        <td class="text-right">¥${c.sales.toLocaleString()}</td>
+                        <td class="text-right">${c.count}点</td>
+                    </tr>
+                `;
+            });
+            mgrCatBody.innerHTML = html;
+        }
+    }
 
     // Render KPIs
     document.getElementById('total-sales').textContent = '¥' + totalSales.toLocaleString();

@@ -21,7 +21,7 @@
     <div class="app-container">
         <header class="main-header">
             <div class="header-content">
-                <h1>🌸 サロン Mode J 売上管理システム <span class="version-badge">v14.0</span></h1>
+                <h1>🌸 サロン Mode J 売上管理システム <span class="version-badge">v14.1</span></h1>
             </div>
             <nav class="main-nav">
                 <button class="nav-btn active" data-tab="input">📝 売上入力</button>
@@ -358,6 +358,41 @@
                         </div>
                     </div>
 
+                    <h3 class="section-subtitle">👑 店長担当実績</h3>
+                    <div class="manager-stats-container"
+                        style="background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 12px; padding: 20px; border: 1px solid #fde68a; margin-bottom: 30px;">
+                        <div class="kpi-grid"
+                            style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
+                            <div class="kpi-card"
+                                style="background: rgba(255,255,255,0.7); border-left: 4px solid #f59e0b;">
+                                <h3 style="color:#b45309;">💰 店長担当売上</h3>
+                                <div class="value" id="manager-total-sales" style="color:#b45309;">¥0</div>
+                            </div>
+                            <div class="kpi-card"
+                                style="background: rgba(255,255,255,0.7); border-left: 4px solid #f59e0b;">
+                                <h3 style="color:#b45309;">👥 店長担当顧客数</h3>
+                                <div class="value" id="manager-customer-count" style="color:#b45309;">0人</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container-small" style="width: 100%; max-width: none;">
+                            <h4 style="color:#92400e; margin-bottom:15px;">📂 カテゴリー別 (店長担当のみ)</h4>
+                            <div class="table-responsive">
+                                <table class="styled-table" id="manager-category-table" style="background:white;">
+                                    <thead>
+                                        <tr style="background:#fef3c7; color:#92400e;">
+                                            <th>カテゴリー</th>
+                                            <th class="text-right">売上</th>
+                                            <th class="text-right">個数</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="manager-category-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="ranking-section-header">
                         <h2>🏆 ランキング TOP 10</h2>
                     </div>
@@ -463,7 +498,7 @@
                         <h3>ℹ️ システム情報</h3>
                         <div class="setting-item">
                             <label>バージョン</label>
-                            <div class="value">v14.0 (Antigravity Enhanced)</div>
+                            <div class="value">v14.1 (Antigravity Enhanced)</div>
                         </div>
                         <div class="setting-item">
                             <label>最終更新</label>
