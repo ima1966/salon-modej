@@ -4,7 +4,7 @@
  */
 
 // --- Constants & Config ---
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwAaTNKwE6RvKUqp2ghLXIOZcRnQxPxu6DvmR-eEsUUwCP0PPDDGflMqVsLi7cZPZmT/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzXcERWyqe9SPXlADuJmG7DW6pQd2JXD_sIOXA850JsZUM0fFnGLI4OW1ennD4CsdPB/exec';
 const STORAGE_KEY = 'salonSalesData';
 
 // --- State ---
