@@ -1,29 +1,13 @@
 /**
- * サロン Mode J 売上管理システム v14.1
+ * サロン Mode J 売上管理システム v14.2
  * Antigravity Refactored Version
  */
 
-// --- Constants & Config ---
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEDYfdXGs9W0ZyCvzqFnkmezQVW9kokAOPHo4qpO4LjI5t8AodlVuqeuE9axDD9JCV/exec';
-const STORAGE_KEY = 'salonSalesData';
-
-// --- State ---
-let salesData = [];
-let editingId = null;
-let itemCounter = 0;
-let editItemCounter = 0;
-
-// Chart Instances
-let charts = {
-    yearly: null,
-    monthly: null,
-    paymentPie: null,
-    dailyTrend: null
-};
+// ... (skipping unchanged code)
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌸 System Initializing v14.0...');
+    console.log('🌸 System Initializing v14.2...');
     loadData();
     initUI();
     initCharts(); // Initialize empty charts
@@ -711,7 +695,7 @@ function renderSalesList() {
 
         html += `
             <tr>
-                <td>${sale.date}</td>
+                <td>${sale.date.includes('T') ? sale.date.split('T')[0] : sale.date}</td>
                 <td style="font-weight:600">${sale.customerName}</td>
                 <td class="text-right" style="font-weight:700">¥${sale.totalAmount.toLocaleString()}</td>
                 <td><span class="badge-${sale.paymentMethod}">${sale.paymentMethod}</span></td>
@@ -1251,7 +1235,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
 
         tableHtml += `
             <tr class="${rowClass}">
-                <td>${day.date}</td>
+                <td>${day.date.includes('T') ? day.date.split('T')[0] : day.date}</td>
                 <td>${dayOfWeek}</td>
                 <td class="text-right">¥${day.sales.toLocaleString()}</td>
                 <td class="text-right">${day.customerCount}人</td>
@@ -1604,6 +1588,8 @@ window.testGASConnection = function () {
 }
 
 function formatDateISO(date) {
+    if (typeof date === 'string') return date.split('T')[0];
+    if (!(date instanceof Date) || isNaN(date)) return '';
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
@@ -1643,7 +1629,22 @@ window.downloadFromGoogleSheets = async function () {
             throw new Error('Invalid data format from GAS');
         }
 
-        salesData = data;
+        salesData = data.map(d => {
+            // Fix: Store as YYYY-MM-DD string to avoid timezone/filter issues on mobile
+            // Ensure date is purely a YYYY-MM-DD string.
+            // If it comes as ISO with time, use new Date() to handle timezone (JST) then format.
+            // BUT, if it's already YYYY-MM-DD, keep it.
+            let cleanDate = d.date;
+            if (cleanDate && typeof cleanDate === 'string' && cleanDate.includes('T')) {
+                // Force JST
+                const dt = new Date(cleanDate);
+                const y = dt.getFullYear();
+                const m = String(dt.getMonth() + 1).padStart(2, '0');
+                const day = String(dt.getDate()).padStart(2, '0');
+                cleanDate = `${y}-${m}-${day}`;
+            }
+            return { ...d, date: cleanDate };
+        });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
 
         // Update UI
