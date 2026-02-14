@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>在庫管理システム | Mode J</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/mobile-gmo.css">
+    <style>
+        /* Inventory Specific Overrides */
+        .stock-list-item {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stock-info {
+            flex: 1;
+        }
+
+        .stock-cat {
+            font-size: 10px;
+            color: #888;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .stock-name {
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .stock-qty {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .stock-qty.low {
+            color: #d32f2f;
+        }
+
+        .cat-filter-bar {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            white-space: nowrap;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .filter-btn.active {
+            background: #2196F3;
+            color: #fff;
+            border-color: #2196F3;
+        }
+
+        /* Input Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .form-select,
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 16px;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-qty-mod {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 20px;
+            color: #666;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 15px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .quick-add-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .q-btn {
+            flex: 1;
+            padding: 8px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="app-header" style="background:#37474f; color:#fff;">
+        <div>📦 Mode J 在庫管理</div>
+        <div id="loading-indicator" style="font-size:12px; display:none;">Updating...</div>
+    </header>
+
+    <main id="content-area">
+
+        <!-- Tab 1: Stock List -->
+        <div id="tab-list" class="tab-view">
+            <div class="cat-filter-bar" id="filter-bar">
+                <button class="filter-btn active" onclick="filterList('ALL')">全て</button>
+                <button class="filter-btn" onclick="filterList('ベルマン')">ベルマン</button>
+                <button class="filter-btn" onclick="filterList('クレンシア')">クレンシア</button>
+                <button class="filter-btn" onclick="filterList('ジェニック')">ジェニック</button>
+                <button class="filter-btn" onclick="filterList('若よもぎ蒸し')">若よもぎ</button>
+            </div>
+            <div id="stock-list-container" style="padding-bottom: 80px;">
+                <!-- Items injected here -->
+                <div style="padding:20px; text-align:center; color:#999;">読み込み中...</div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Add Stock (In) -->
+        <div id="tab-in" class="tab-view hidden" style="padding:20px;">
+            <h3 style="margin-top:0;">入庫登録</h3>
+
+            <div class="form-group">
+                <label class="form-label">メーカー (Category)</label>
+                <select id="in-category" class="form-select" onchange="updateProductSelect()">
+                    <option value="">選択してください</option>
+                    <option value="ベルマン">ベルマン</option>
+                    <option value="クレンシア">クレンシア</option>
+                    <option value="ジェニック">ジェニック</option>
+                    <option value="若よもぎ蒸し">若よもぎ蒸し</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">商品 (Product)</label>
+                <select id="in-product" class="form-select" disabled>
+                    <option value="">メーカーを選択してください</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">入庫数 (Quantity)</label>
+                <div class="qty-control">
+                    <button class="btn-qty-mod" onclick="modQty(-1)">-</button>
+                    <input type="number" id="in-qty" class="form-input" value="1" style="text-align:center; flex:1;">
+                    <button class="btn-qty-mod" onclick="modQty(1)">+</button>
+                </div>
+                <div class="quick-add-btns">
+                    <button class="q-btn" onclick="setQty(5)">+5</button>
+                    <button class="q-btn" onclick="setQty(10)">+10</button>
+                    <button class="q-btn" onclick="setQty(24)">+24</button>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="submitStockIn()">入庫を確定する</button>
+        </div>
+
+        <!-- Tab 3: New Product -->
+        <div id="tab-new" class="tab-view hidden" style="padding:20px;">
+            <h3 style="margin-top:0;">新規商品登録</h3>
+            <p style="font-size:12px; color:#666;">初めて仕入れる商品はここからマスタに登録してください。</p>
+
+            <div class="form-group">
+                <label class="form-label">メーカー</label>
+                <select id="new-category" class="form-select">
+                    <option value="ベルマン">ベルマン</option>
+                    <option value="クレンシア">クレンシア</option>
+                    <option value="ジェニック">ジェニック</option>
+                    <option value="若よもぎ蒸し">若よもぎ蒸し</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">商品名</label>
+                <input type="text" id="new-name" class="form-input" placeholder="商品名を入力">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">販売単価 (任意)</label>
+                <input type="number" id="new-price" class="form-input" placeholder="¥0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">初期在庫数</label>
+                <input type="number" id="new-stock" class="form-input" value="0">
+            </div>
+
+            <button class="btn-action" style="background:#4CAF50;" onclick="submitNewProduct()">マスタに登録</button>
+        </div>
+
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-btn active" onclick="switchTab('list', this)">
+            <div class="nav-icon">📊</div>
+            <div>在庫一覧</div>
+        </div>
+        <div class="nav-btn" onclick="switchTab('in', this)">
+            <div class="nav-icon">📥</div>
+            <div>入庫登録</div>
+        </div>
+        <div class="nav-btn" onclick="switchTab('new', this)">
+            <div class="nav-icon">✨</div>
+            <div>新規商品</div>
+        </div>
+    </nav>
+
+    <script src="js/inventory.js"></script>
+</body>
+
+</html>

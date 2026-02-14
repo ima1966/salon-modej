@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>サロンMode J 経営ダッシュボード</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/mobile-gmo.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="app-header">
+        サロンMode J 経営ダッシュボード <span style="font-size:0.7rem; opacity:0.8;">v14.2</span>
+    </header>
+
+    <!-- Content Area -->
+    <main id="content-area">
+
+        <!-- Tab: Home -->
+        <div id="tab-home" class="tab-view">
+            <div class="metrics-list">
+
+                <!-- 1. Today's Sales -->
+                <div class="metric-item">
+                    <div class="metric-header">
+                        <button class="btn-trend" onclick="openChart('sales', '売上高')">📈 推移</button>
+                        <span class="metric-label">本日の売上高</span>
+                    </div>
+                    <div class="metric-value-row" id="val-today-sales">¥0</div>
+                </div>
+
+                <!-- 2. Today's Customers -->
+                <div class="metric-item">
+                    <div class="metric-header">
+                        <button class="btn-trend" onclick="openChart('customers', '顧客数')">📈 推移</button>
+                        <span class="metric-label">本日の顧客数</span>
+                    </div>
+                    <div class="metric-value-row" id="val-today-customers">0 名</div>
+                </div>
+
+                <!-- 3. Today's Avg Customer Spend -->
+                <div class="metric-item">
+                    <div class="metric-header">
+                        <button class="btn-trend" onclick="openChart('avg-customer', '平均客単価')">📈 推移</button>
+                        <span class="metric-label">本日の平均客単価</span>
+                    </div>
+                    <div class="metric-value-row" id="val-today-avg-customer">¥0</div>
+                </div>
+
+                <!-- 4. Today's Transactions -->
+                <div class="metric-item">
+                    <div class="metric-header">
+                        <button class="btn-trend" onclick="openChart('transactions', '取引数')">📈 推移</button>
+                        <span class="metric-label">本日の取引数</span>
+                    </div>
+                    <div class="metric-value-row" id="val-today-transactions">0 件</div>
+                </div>
+
+                <!-- 5. Today's Avg Transaction Value -->
+                <div class="metric-item">
+                    <div class="metric-header">
+                        <button class="btn-trend" onclick="openChart('avg-transaction', '平均取引額')">📈 推移</button>
+                        <span class="metric-label">本日の平均取引額</span>
+                    </div>
+                    <div class="metric-value-row" id="val-today-avg-transaction">¥0</div>
+                </div>
+
+            </div>
+
+            <!-- Green Banner -->
+            <div class="green-banner">
+                <div class="banner-label">今月の総売上高</div>
+                <div class="banner-value" id="val-month-total">¥0</div>
+                <div class="banner-sub">
+                    月末まで残り <span style="font-weight:bold; font-size:1.1rem;" id="val-month-remain-days">0</span> 日
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: List (Placeholder) -->
+        <div id="tab-list" class="tab-view hidden" style="padding:20px; text-align:center;">
+            <p>売上一覧画面 (準備中)</p>
+        </div>
+
+        <!-- Tab: Detail (Placeholder) -->
+        <div id="tab-detail" class="tab-view hidden" style="padding:20px; text-align:center;">
+            <p>売上詳細画面 (準備中)</p>
+        </div>
+
+        <!-- Tab: Settings (Placeholder) -->
+        <div id="tab-settings" class="tab-view hidden" style="padding:20px; text-align:center;">
+            <p>設定画面 (準備中)</p>
+            <button onclick="location.reload()" style="padding:10px 20px;">データ更新</button>
+        </div>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <div class="nav-btn active" onclick="switchNav('home', this)">
+            <div class="nav-icon">🏠</div>
+            <div>ホーム</div>
+        </div>
+        <div class="nav-btn" onclick="switchNav('list', this)">
+            <div class="nav-icon">📊</div>
+            <div>売上一覧</div>
+        </div>
+        <div class="nav-btn" onclick="switchNav('detail', this)">
+            <div class="nav-icon">📝</div>
+            <div>売上詳細</div>
+        </div>
+        <div class="nav-btn" onclick="switchNav('settings', this)">
+            <div class="nav-icon">🔧</div>
+            <div>設定</div>
+        </div>
+    </nav>
+
+    <!-- Chart Overlay View -->
+    <div id="chart-overlay" class="chart-view">
+        <div class="chart-header-bar">
+            <button class="btn-back" onclick="closeChart()">←</button>
+            <div class="chart-title" id="chart-overlay-title">推移</div>
+        </div>
+        <div class="chart-controls">
+            <button class="chart-period-btn active" onclick="updateChartPeriod('1M', this)">1ヶ月</button>
+            <button class="chart-period-btn" onclick="updateChartPeriod('3M', this)">3ヶ月</button>
+            <button class="chart-period-btn" onclick="updateChartPeriod('6M', this)">6ヶ月</button>
+            <button class="chart-period-btn" onclick="updateChartPeriod('1Y', this)">1年</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="trendCanvas"></canvas>
+        </div>
+    </div>
+
+    <script src="js/mobile-gmo.js?v=14.2"></script>
+</body>
+
+</html>

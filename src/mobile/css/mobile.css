@@ -1,0 +1,353 @@
+:root {
+    --bg-dark: #121212;
+    --bg-panel: #1e1e1e;
+    --bg-header: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --text-up: #ff4560;
+    /* Red/Pink for Positive/Up (Japan Finance Style) */
+    --text-down: #00e676;
+    /* Green/Blue for Negative/Down */
+    --accent: #2196f3;
+    --border: #333333;
+    --tab-bg: #1a1a1a;
+    --tab-active: #ffffff;
+    --tab-inactive: #666666;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', 'Noto Sans JP', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    padding-bottom: 60px;
+    /* Space for Bottom Nav */
+    overflow-x: hidden;
+}
+
+/* Header */
+.app-header {
+    background: var(--bg-header);
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-title {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.status-indicator {
+    position: absolute;
+    right: 15px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--text-secondary);
+}
+
+.status-indicator.online {
+    background-color: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+}
+
+/* Bottom Nav */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 55px;
+    background: var(--tab-bg);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--tab-inactive);
+    font-size: 0.65rem;
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.nav-item.active {
+    color: var(--accent);
+}
+
+.nav-icon {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+}
+
+/* Tab Content */
+.tab-page {
+    display: none;
+    padding: 10px;
+    animation: fadeIn 0.2s ease;
+}
+
+.tab-page.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Finance Modules */
+
+/* 1. Ticker / Summary Board */
+.summary-board {
+    background: var(--bg-panel);
+    border-radius: 4px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--accent);
+}
+
+.board-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.board-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.board-sub {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.board-diff {
+    font-weight: bold;
+}
+
+.text-up {
+    color: var(--text-up);
+}
+
+.text-down {
+    color: var(--text-down);
+}
+
+
+/* 2. Chart Container */
+.chart-panel {
+    background: var(--bg-panel);
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    height: 250px;
+    position: relative;
+    border: 1px solid #333;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.zoom-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.zoom-btn {
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 0.7rem;
+}
+
+.zoom-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+
+/* 3. List / Board (Product Ranking styled like Market Board) */
+.market-list {
+    background: var(--bg-panel);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.market-header {
+    display: flex;
+    background: #252525;
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+}
+
+.col-name {
+    flex: 2;
+}
+
+.col-price {
+    flex: 1;
+    text-align: right;
+}
+
+.col-change {
+    flex: 1;
+    text-align: right;
+}
+
+.market-row {
+    display: flex;
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: background 0.1s;
+}
+
+.market-row:active {
+    background: #333;
+}
+
+.row-name {
+    flex: 2;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.row-sub {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    display: block;
+}
+
+.row-price {
+    flex: 1;
+    text-align: right;
+    font-weight: 700;
+    font-family: 'Roboto', sans-serif;
+}
+
+.row-change {
+    flex: 1;
+    text-align: right;
+    font-size: 0.8rem;
+}
+
+
+/* Manager Section styled like account info */
+.account-info {
+    background: var(--bg-panel);
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.account-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
+.account-main {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.progress-container {
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--accent);
+}
+
+/* News/History List */
+.history-item {
+    font-size: 0.85rem;
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+}
+
+.history-date {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+/* Flashing Effect for Updates */
+@keyframes flashUp {
+    0% {
+        background-color: rgba(255, 69, 96, 0.5);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+@keyframes flashDown {
+    0% {
+        background-color: rgba(0, 230, 118, 0.5);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+.flash-up {
+    animation: flashUp 1s ease-out;
+}
+
+.flash-down {
+    animation: flashDown 1s ease-out;
+}
