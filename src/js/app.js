@@ -3,7 +3,23 @@
  * Antigravity Refactored Version
  */
 
-// ... (skipping unchanged code)
+// --- Constants & Config ---
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEDYfdXGs9W0ZyCvzqFnkmezQVW9kokAOPHo4qpO4LjI5t8AodlVuqeuE9axDD9JCV/exec';
+const STORAGE_KEY = 'salonSalesData';
+
+// --- State ---
+let salesData = [];
+let editingId = null;
+let itemCounter = 0;
+let editItemCounter = 0;
+
+// Chart Instances
+let charts = {
+    yearly: null,
+    monthly: null,
+    paymentPie: null,
+    dailyTrend: null
+};
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -573,7 +589,11 @@ function applyPeriodFilter(period, silent = false) {
         const s = new Date(currentFilter.start);
         const e = new Date(currentFilter.end);
 
-        // If starts on 1st and ends on last day of same month
+        // --- Constants & Config ---
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEDYfdXGs9W0ZyCvzqFnkmezQVW9kokAOPHo4qpO4LjI5t8AodlVuqeuE9axDD9JCV/exec';
+        const STORAGE_KEY = 'salonSalesData';
+
+        // --- State ---month
         const isFullMonth = s.getDate() === 1 &&
             e.getMonth() === s.getMonth() &&
             e.getFullYear() === s.getFullYear() &&
