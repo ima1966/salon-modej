@@ -57,4 +57,20 @@
     .chart-wrapper {
         height: 220px;
     }
+
+    /* Fix for Payment Matrix Table Scroll */
+    .matrix-container {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        /* Space for scrollbar */
+    }
+
+    .matrix-table {
+        min-width: 500px;
+        /* Force horizontal scroll */
+    }
 }
