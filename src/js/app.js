@@ -1,5 +1,5 @@
 /**
- * サロン Mode J 売上管理システム v14.2
+ * サロン Mode J 売上管理システム v14.3
  * Antigravity Refactored Version
  */
 
@@ -23,7 +23,7 @@ let charts = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌸 System Initializing v14.2...');
+    console.log('🌸 System Initializing v14.3...');
     loadData();
     initUI();
     initCharts(); // Initialize empty charts
