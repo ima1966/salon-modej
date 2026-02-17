@@ -692,6 +692,7 @@ function renderSalesList() {
 
     let html = `<table class="styled-table"><thead><tr>
         <th class="sortable" onclick="sortSalesList('date')" style="cursor:pointer">日付 ${getSortIcon('date')}</th>
+        <th>曜日</th>
         <th class="sortable" onclick="sortSalesList('customer')" style="cursor:pointer">お客様名 ${getSortIcon('customer')}</th>
         <th class="sortable text-right" onclick="sortSalesList('amount')" style="cursor:pointer">金額 ${getSortIcon('amount')}</th>
         <th class="sortable" onclick="sortSalesList('payment')" style="cursor:pointer">決済 ${getSortIcon('payment')}</th>
@@ -713,9 +714,20 @@ function renderSalesList() {
             `;
         }).join('');
 
+        const dateObj = new Date(sale.date);
+        const dayIdx = dateObj.getDay();
+        const dayStr = ['日', '月', '火', '水', '木', '金', '土'][dayIdx];
+        const isHol = JapaneseHolidays.isHoliday(dateObj);
+
+        // Color Logic: Sun(0)/Wed(3)/Holiday = Red, Sat(6) = Blue
+        let dateColor = '#333';
+        if (dayIdx === 0 || dayIdx === 3 || isHol) dateColor = '#ef4444'; // Red
+        else if (dayIdx === 6) dateColor = '#3b82f6'; // Blue
+
         html += `
             <tr>
-                <td>${sale.date.includes('T') ? sale.date.split('T')[0] : sale.date}</td>
+                <td style="color:${dateColor}; font-weight:500;">${sale.date.includes('T') ? sale.date.split('T')[0] : sale.date}</td>
+                <td style="color:${dateColor}; font-weight:500;">${dayStr}</td>
                 <td style="font-weight:600">${sale.customerName}</td>
                 <td class="text-right" style="font-weight:700">¥${sale.totalAmount.toLocaleString()}</td>
                 <td><span class="badge-${sale.paymentMethod}">${sale.paymentMethod}</span></td>
@@ -967,6 +979,7 @@ function renderCharts(year, month) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const dailyTotals = new Array(daysInMonth).fill(0);
     const barColors = new Array(daysInMonth).fill('#764ba2'); // Default Purple
+    const labelColors = new Array(daysInMonth).fill('#666'); // Default Label Color
 
     let monthlySum = 0;
     let monthlyCount = 0;
@@ -986,10 +999,15 @@ function renderCharts(year, month) {
         const dayOfWeek = currentDate.getDay();
         const isHol = JapaneseHolidays.isHoliday(currentDate);
 
-        if (dayOfWeek === 0 || isHol) { // Sun OR Holiday
-            barColors[i] = '#ef4444'; // Red
-        } else if (dayOfWeek === 6) { // Sat
-            barColors[i] = '#3b82f6'; // Blue
+        // Sun(0), Wed(3), Holiday => Red
+        if (dayOfWeek === 0 || dayOfWeek === 3 || isHol) {
+            barColors[i] = '#ef4444';
+            labelColors[i] = '#ef4444';
+        }
+        // Sat(6) => Blue
+        else if (dayOfWeek === 6) {
+            barColors[i] = '#3b82f6';
+            labelColors[i] = '#3b82f6';
         }
     }
 
@@ -997,6 +1015,19 @@ function renderCharts(year, month) {
         charts.monthly.data.labels = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}日`);
         charts.monthly.data.datasets[0].data = dailyTotals;
         charts.monthly.data.datasets[0].backgroundColor = barColors;
+
+        // Update Axis Colors dynamically
+        charts.monthly.options.scales = {
+            x: {
+                ticks: {
+                    color: labelColors // Array of colors for each label
+                }
+            },
+            y: {
+                beginAtZero: true
+            }
+        };
+
         charts.monthly.update();
     }
     document.getElementById('monthly-total').textContent = '¥' + monthlySum.toLocaleString();
