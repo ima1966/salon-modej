@@ -705,20 +705,22 @@ select:focus {
     text-align: right;
 }
 
-.row-sat {
+.row-blue {
     background-color: rgba(59, 130, 246, 0.05) !important;
 }
 
-.row-sat td:nth-child(2) {
+.row-blue td:nth-child(1),
+.row-blue td:nth-child(2) {
     color: #2563eb;
     font-weight: bold;
 }
 
-.row-sun {
+.row-red {
     background-color: rgba(239, 68, 68, 0.05) !important;
 }
 
-.row-sun td:nth-child(2) {
+.row-red td:nth-child(1),
+.row-red td:nth-child(2) {
     color: #dc2626;
     font-weight: bold;
 }
