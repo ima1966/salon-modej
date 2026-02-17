@@ -1,5 +1,5 @@
 /**
- * サロン Mode J 売上管理システム v14.6
+ * サロン Mode J 売上管理システム v14.6.01
  * Antigravity Refactored Version
  */
 
@@ -23,7 +23,7 @@ let charts = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌸 System Initializing v14.5...');
+    console.log('🌸 System Initializing v14.6.01 (Color: Wed/Sun Only)...');
     loadData();
     initUI();
     initCharts(); // Initialize empty charts
@@ -717,17 +717,16 @@ function renderSalesList() {
         const dateObj = new Date(sale.date);
         const dayIdx = dateObj.getDay();
         const dayStr = ['日', '月', '火', '水', '木', '金', '土'][dayIdx];
-        const isHol = JapaneseHolidays.isHoliday(dateObj);
 
-        // Color Logic: Sun(0)/Wed(3) Only = Red, Sat(6) = Blue (Holidays are normal)
-        let dateColor = '#333';
-        if (dayIdx === 0 || dayIdx === 3) dateColor = '#ef4444'; // Red
-        else if (dayIdx === 6) dateColor = '#3b82f6'; // Blue
+        // CSS Classes for Row Styling
+        let rowClass = '';
+        if (dayIdx === 0 || dayIdx === 3) rowClass = 'row-red'; // Sun(0) or Wed(3)
+        else if (dayIdx === 6) rowClass = 'row-blue'; // Sat(6)
 
         html += `
-            <tr>
-                <td style="color:${dateColor}; font-weight:500;">${sale.date.includes('T') ? sale.date.split('T')[0] : sale.date}</td>
-                <td style="color:${dateColor}; font-weight:500;">${dayStr}</td>
+            <tr class="${rowClass}">
+                <td style="font-weight:500;">${sale.date.includes('T') ? sale.date.split('T')[0] : sale.date}</td>
+                <td style="font-weight:500;">${dayStr}</td>
                 <td style="font-weight:600">${sale.customerName}</td>
                 <td class="text-right" style="font-weight:700">¥${sale.totalAmount.toLocaleString()}</td>
                 <td><span class="badge-${sale.paymentMethod}">${sale.paymentMethod}</span></td>
@@ -1273,8 +1272,8 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
         const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][dayOfWeekIdx];
 
         let rowClass = '';
-        if (dayOfWeekIdx === 0) rowClass = 'row-sun';
-        if (dayOfWeekIdx === 6) rowClass = 'row-sat';
+        if (dayOfWeekIdx === 0 || dayOfWeekIdx === 3) rowClass = 'row-red'; // Sun or Wed
+        if (dayOfWeekIdx === 6) rowClass = 'row-blue'; // Sat
 
         let diffHtml = '<span style="color:#ccc">-</span>';
         if (day.hasPrev) {
