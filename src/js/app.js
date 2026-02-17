@@ -1,5 +1,5 @@
 /**
- * サロン Mode J 売上管理システム v14.4
+ * サロン Mode J 売上管理システム v14.6
  * Antigravity Refactored Version
  */
 
@@ -23,7 +23,7 @@ let charts = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌸 System Initializing v14.4...');
+    console.log('🌸 System Initializing v14.5...');
     loadData();
     initUI();
     initCharts(); // Initialize empty charts
@@ -719,9 +719,9 @@ function renderSalesList() {
         const dayStr = ['日', '月', '火', '水', '木', '金', '土'][dayIdx];
         const isHol = JapaneseHolidays.isHoliday(dateObj);
 
-        // Color Logic: Sun(0)/Wed(3)/Holiday = Red, Sat(6) = Blue
+        // Color Logic: Sun(0)/Wed(3) Only = Red, Sat(6) = Blue (Holidays are normal)
         let dateColor = '#333';
-        if (dayIdx === 0 || dayIdx === 3 || isHol) dateColor = '#ef4444'; // Red
+        if (dayIdx === 0 || dayIdx === 3) dateColor = '#ef4444'; // Red
         else if (dayIdx === 6) dateColor = '#3b82f6'; // Blue
 
         html += `
@@ -997,10 +997,10 @@ function renderCharts(year, month) {
     for (let i = 0; i < daysInMonth; i++) {
         const currentDate = new Date(year, month, i + 1);
         const dayOfWeek = currentDate.getDay();
-        const isHol = JapaneseHolidays.isHoliday(currentDate);
+        // const isHol = JapaneseHolidays.isHoliday(currentDate); // Ignoring holidays as requested
 
-        // Sun(0), Wed(3), Holiday => Red
-        if (dayOfWeek === 0 || dayOfWeek === 3 || isHol) {
+        // Sun(0), Wed(3) Only => Red
+        if (dayOfWeek === 0 || dayOfWeek === 3) {
             barColors[i] = '#ef4444';
             labelColors[i] = '#ef4444';
         }
