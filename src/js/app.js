@@ -1078,7 +1078,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
                     managerCategoryStats[item.category] = { sales: 0, count: 0 };
                 }
                 managerCategoryStats[item.category].sales += sub;
-                managerCategoryStats[item.category].count += (item.quantity || 0);
+                managerCategoryStats[item.category].count += 1; // Count occurrences/transactions, not quantity
             }
         });
 
@@ -1109,7 +1109,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
                     <tr>
                         <td>${c.name}</td>
                         <td class="text-right">¥${c.sales.toLocaleString()}</td>
-                        <td class="text-right">${c.count}点</td>
+                        <td class="text-right">${c.count}件</td>
                     </tr>
                 `;
             });
