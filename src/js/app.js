@@ -3,8 +3,10 @@
  * Antigravity Refactored Version
  */
 
+
+
 // --- Constants & Config ---
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEDYfdXGs9W0ZyCvzqFnkmezQVW9kokAOPHo4qpO4LjI5t8AodlVuqeuE9axDD9JCV/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwL77JTuO4xydRdVgHV1AHfLPTqV68oFjvqnUHAN_wmeRsZtl1RPgL8U55_DLoOTkhx/exec';
 const STORAGE_KEY = 'salonSalesData';
 
 // --- State ---
@@ -589,11 +591,7 @@ function applyPeriodFilter(period, silent = false) {
         const s = new Date(currentFilter.start);
         const e = new Date(currentFilter.end);
 
-        // --- Constants & Config ---
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEDYfdXGs9W0ZyCvzqFnkmezQVW9kokAOPHo4qpO4LjI5t8AodlVuqeuE9axDD9JCV/exec';
-        const STORAGE_KEY = 'salonSalesData';
 
-        // --- State ---month
         const isFullMonth = s.getDate() === 1 &&
             e.getMonth() === s.getMonth() &&
             e.getFullYear() === s.getFullYear() &&
@@ -1696,6 +1694,35 @@ window.downloadFromGoogleSheets = async function () {
             return { ...d, date: cleanDate };
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
+
+        // --- 【自動切り替え】データ内の最新月に合わせて表示期間を更新 ---
+        if (salesData.length > 0) {
+            let maxDateStr = salesData[0].date;
+            for (let i = 1; i < salesData.length; i++) {
+                if (salesData[i].date > maxDateStr) {
+                    maxDateStr = salesData[i].date;
+                }
+            }
+            if (maxDateStr) {
+                const parts = maxDateStr.split('-');
+                if (parts.length >= 2) {
+                    const y = parts[0];
+                    const m = parts[1];
+                    const monthStr = `${y}-${m}`;
+
+                    // ダッシュボードの対象月を最新データに合わせる
+                    document.getElementById('dashboard-start-period').value = monthStr;
+                    document.getElementById('dashboard-end-period').value = monthStr;
+                    document.getElementById('dashboard-period-display').innerText = `${monthStr} 〜 ${monthStr}`;
+
+                    // 売上一覧の期間（カスタム）も同月に自動セットし適用
+                    const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
+                    document.getElementById('list-period-start').value = `${monthStr}-01`;
+                    document.getElementById('list-period-end').value = `${monthStr}-${String(lastDay).padStart(2, '0')}`;
+                    applyCustomPeriod(); // リスト・フィルタ・チャートを更新
+                }
+            }
+        }
 
         // Update UI
         updateDashboard();
