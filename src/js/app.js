@@ -157,9 +157,16 @@ function initUI() {
     document.querySelectorAll('.edit-payment-option').forEach(opt => {
         opt.addEventListener('click', () => selectEditPaymentMethod(opt));
     });
+
+    // 最後に開いていたタブを復元（なければ 'input'）
+    const lastActiveTab = localStorage.getItem('activeTab') || 'input';
+    switchTab(lastActiveTab);
 }
 
 window.switchTab = function (tabId) {
+    // 開いたタブを記憶する
+    localStorage.setItem('activeTab', tabId);
+
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `${tabId}-tab`));
 
