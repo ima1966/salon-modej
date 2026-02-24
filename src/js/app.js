@@ -1695,6 +1695,10 @@ window.downloadFromGoogleSheets = async function () {
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
 
+        // UI用カウント更新
+        document.getElementById('local-data-count').textContent = `${salesData.length}件`;
+        updateYearSelector();
+
         // --- 【自動切り替え】データ内の最新月に合わせて表示期間を更新 ---
         if (salesData.length > 0) {
             let maxDateStr = salesData[0].date;
@@ -1710,24 +1714,24 @@ window.downloadFromGoogleSheets = async function () {
                     const m = parts[1];
                     const monthStr = `${y}-${m}`;
 
+                    // 売上一覧の期間（カスタム）も同月に自動セット
+                    const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
+                    document.getElementById('list-period-start').value = `${monthStr}-01`;
+                    document.getElementById('list-period-end').value = `${monthStr}-${String(lastDay).padStart(2, '0')}`;
+                    currentFilter = { start: `${monthStr}-01`, end: `${monthStr}-${String(lastDay).padStart(2, '0')}`, periodName: 'custom' };
+                    document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+                    document.getElementById('current-period-display').innerText = `期間: ${monthStr}-01 〜 ${monthStr}-${String(lastDay).padStart(2, '0')}`;
+
                     // ダッシュボードの対象月を最新データに合わせる
                     document.getElementById('dashboard-start-period').value = monthStr;
                     document.getElementById('dashboard-end-period').value = monthStr;
                     document.getElementById('dashboard-period-display').innerText = `${monthStr} 〜 ${monthStr}`;
-
-                    // 売上一覧の期間（カスタム）も同月に自動セットし適用
-                    const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
-                    document.getElementById('list-period-start').value = `${monthStr}-01`;
-                    document.getElementById('list-period-end').value = `${monthStr}-${String(lastDay).padStart(2, '0')}`;
-                    applyCustomPeriod(); // リスト・フィルタ・チャートを更新
                 }
             }
         }
 
-        // Update UI
+        // 全体のUIを更新する関数を最後に1回だけ呼ぶ（この中で renderSalesList, renderCharts, renderDashboardKPIS が走る）
         updateDashboard();
-        updateYearSelector();
-        document.getElementById('local-data-count').textContent = `${salesData.length}件`;
 
         showNotification(`復元完了: ${salesData.length}件のデータをロードしました`);
 
