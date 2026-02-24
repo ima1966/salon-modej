@@ -1683,20 +1683,56 @@ window.downloadFromGoogleSheets = async function () {
         }
 
         salesData = data.map(d => {
-            // Fix: Store as YYYY-MM-DD string to avoid timezone/filter issues on mobile
-            // Ensure date is purely a YYYY-MM-DD string.
-            // If it comes as ISO with time, use new Date() to handle timezone (JST) then format.
-            // BUT, if it's already YYYY-MM-DD, keep it.
-            let cleanDate = d.date;
-            if (cleanDate && typeof cleanDate === 'string' && cleanDate.includes('T')) {
-                // Force JST
-                const dt = new Date(cleanDate);
-                const y = dt.getFullYear();
-                const m = String(dt.getMonth() + 1).padStart(2, '0');
-                const day = String(dt.getDate()).padStart(2, '0');
-                cleanDate = `${y}-${m}-${day}`;
+            let cleanDate = d.date || '';
+
+            // [罠1] 日付が「空欄」の場合、データ作成日時(createdAt)を代用する
+            if (!cleanDate || cleanDate === '') {
+                cleanDate = d.createdAt || '';
             }
-            return { ...d, date: cleanDate };
+
+            // [罠2] 日付が「Fri Jan 09 2026 00:00:00 GM」のように壊れて送られてきている場合を解析
+            if (cleanDate) {
+                // すでに綺麗な YYYY-MM-DD になっていない場合のみ処理
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(cleanDate)) {
+                    // Javascriptの標準パースを試みる（" GM" などのゴミを除去）
+                    const dt = new Date(cleanDate.replace(' GM', '').trim());
+                    if (!isNaN(dt.getTime())) {
+                        const y = dt.getFullYear();
+                        const m = String(dt.getMonth() + 1).padStart(2, '0');
+                        const day = String(dt.getDate()).padStart(2, '0');
+                        cleanDate = `${y}-${m}-${day}`;
+                    } else {
+                        // それでも失敗する場合、最後の手段で正規表現で数字だけを抜き出す
+                        const match = cleanDate.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+                        if (match) {
+                            const y = match[1];
+                            const m = String(match[2]).padStart(2, '0');
+                            const day = String(match[3]).padStart(2, '0');
+                            cleanDate = `${y}-${m}-${day}`;
+                        } else {
+                            // 本当にどうしようもない場合は今日の日付にする
+                            const now = new Date();
+                            cleanDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                        }
+                    }
+                }
+            } else {
+                // cleanDate自体が空の場合（フォールバックも無かった場合）
+                const now = new Date();
+                cleanDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            }
+
+            // items配列が存在しない・壊れている場合のフォールバック
+            let items = d.items;
+            if (!items && d.products) items = d.products; // 古い形式との互換
+            if (!Array.isArray(items)) items = [];
+
+            return {
+                ...d,
+                date: cleanDate,
+                items: items,
+                totalAmount: Number(d.totalAmount) || 0
+            };
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
 
