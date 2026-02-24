@@ -868,10 +868,15 @@ function updateDashboard() {
     renderSalesList();
 
     // Dashboard Period
-    const startStr = document.getElementById('dashboard-start-period').value || new Date().toISOString().slice(0, 7);
-    const endStr = document.getElementById('dashboard-end-period').value || new Date().toISOString().slice(0, 7);
+    // もし input に値が入っていればそれを使い、入っていなければ現在月にする
+    const startInputStr = document.getElementById('dashboard-start-period').value;
+    const endInputStr = document.getElementById('dashboard-end-period').value;
 
-    if (!document.getElementById('dashboard-start-period').value) {
+    const startStr = startInputStr || new Date().toISOString().slice(0, 7);
+    const endStr = endInputStr || new Date().toISOString().slice(0, 7);
+
+    // input が空だった場合のみ、現在月をセットする
+    if (!startInputStr) {
         document.getElementById('dashboard-start-period').value = startStr;
         document.getElementById('dashboard-end-period').value = endStr;
         document.getElementById('dashboard-period-display').innerText = `${startStr} 〜 ${endStr}`;
