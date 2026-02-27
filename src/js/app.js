@@ -170,8 +170,15 @@ window.switchTab = function (tabId) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `${tabId}-tab`));
 
-    if (tabId === 'dashboard') {
-        updateCharts();
+    if (tabId === 'dashboard' || tabId === 'list') {
+        // タブ切り替え時にダッシュボード/一覧のデータとグラフを最新化し、表示サイズも再計算させる
+        if (typeof updateDashboard === 'function') {
+            updateDashboard();
+        }
+        // Chart.js のリサイズバグ（display:noneからblockへの復帰時）を防止
+        Object.values(charts).forEach(chart => {
+            if (chart) chart.resize();
+        });
     }
 }
 
