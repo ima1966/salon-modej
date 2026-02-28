@@ -144,8 +144,36 @@ function initUI() {
         });
     });
 
-    // Default Filters
-    applyPeriodFilter('current-month', true);
+    // Default Filters or Restored Filters
+    const savedFilter = localStorage.getItem('lastListFilter');
+    if (savedFilter) {
+        try {
+            const parsed = JSON.parse(savedFilter);
+            if (parsed.periodName === 'custom') {
+                document.getElementById('list-period-start').value = parsed.start || '';
+                document.getElementById('list-period-end').value = parsed.end || '';
+                applyCustomPeriod(true);
+            } else {
+                applyPeriodFilter(parsed.periodName, true);
+            }
+        } catch (e) {
+            applyPeriodFilter('current-month', true);
+        }
+    } else {
+        applyPeriodFilter('current-month', true);
+    }
+
+    // ⭐ Restore Dashboard Filters Explicitly to prevent browser cache issues
+    const savedDashStart = localStorage.getItem('lastDashboardStart');
+    const savedDashEnd = localStorage.getItem('lastDashboardEnd');
+    if (savedDashStart && savedDashEnd) {
+        document.getElementById('dashboard-start-period').value = savedDashStart;
+        document.getElementById('dashboard-end-period').value = savedDashEnd;
+    } else {
+        const nowM = new Date().toISOString().slice(0, 7);
+        document.getElementById('dashboard-start-period').value = nowM;
+        document.getElementById('dashboard-end-period').value = nowM;
+    }
 
     // Edit Form Listeners
     document.getElementById('add-edit-item-btn').addEventListener('click', addEditItemRow);
@@ -587,6 +615,7 @@ function applyPeriodFilter(period, silent = false) {
         end: end ? formatDateISO(end) : null,
         periodName: period
     };
+    localStorage.setItem('lastListFilter', JSON.stringify(currentFilter));
 
     // Update Display
     let displayText = '';
@@ -631,19 +660,20 @@ function applyPeriodFilter(period, silent = false) {
     if (!silent) renderCharts(start ? start.getFullYear() : now.getFullYear(), start ? start.getMonth() : now.getMonth());
 }
 
-function applyCustomPeriod() {
+function applyCustomPeriod(silent = false) {
     const s = document.getElementById('list-period-start').value;
     const e = document.getElementById('list-period-end').value;
     if (s && e) {
         currentFilter = { start: s, end: e, periodName: 'custom' };
+        localStorage.setItem('lastListFilter', JSON.stringify(currentFilter));
         document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
         document.getElementById('current-period-display').innerText = `期間: ${s} 〜 ${e}`;
-        renderSalesList();
+        if (!silent) renderSalesList();
 
         // Charts: Use the END date of the range to show the most recent relevant data
         // instead of the start date which might be far in the past (e.g. 2024 in a 2024-2025 range)
         const ed = new Date(e);
-        renderCharts(ed.getFullYear(), ed.getMonth());
+        if (!silent) renderCharts(ed.getFullYear(), ed.getMonth());
 
         // Also update the dropdown to match
         const yearSelector = document.getElementById('yearly-year-selector');
@@ -882,21 +912,20 @@ function updateDashboard() {
     renderSalesList();
 
     // Dashboard Period
-    // もし input に値が入っていればそれを使い、入っていなければ現在月にする
-    const startInputStr = document.getElementById('dashboard-start-period').value;
-    const endInputStr = document.getElementById('dashboard-end-period').value;
+    let startInputStr = document.getElementById('dashboard-start-period').value;
+    let endInputStr = document.getElementById('dashboard-end-period').value;
 
-    const startStr = startInputStr || new Date().toISOString().slice(0, 7);
-    const endStr = endInputStr || new Date().toISOString().slice(0, 7);
-
-    // input が空だった場合のみ、現在月をセットする
-    if (!startInputStr) {
-        document.getElementById('dashboard-start-period').value = startStr;
-        document.getElementById('dashboard-end-period').value = endStr;
-        document.getElementById('dashboard-period-display').innerText = `${startStr} 〜 ${endStr}`;
+    if (!startInputStr || !endInputStr) {
+        startInputStr = new Date().toISOString().slice(0, 7);
+        endInputStr = new Date().toISOString().slice(0, 7);
+        document.getElementById('dashboard-start-period').value = startInputStr;
+        document.getElementById('dashboard-end-period').value = endInputStr;
     }
 
-    renderDashboardKPIS(startStr, endStr);
+    // 表示文字も必ず更新
+    document.getElementById('dashboard-period-display').innerText = `${startInputStr} 〜 ${endInputStr}`;
+
+    renderDashboardKPIS(startInputStr, endInputStr);
 
     const now = new Date();
     const d = currentFilter.start ? new Date(currentFilter.start) : now;
@@ -1466,6 +1495,8 @@ function applyQuickPeriod(type) {
 function applyDashboardPeriod() {
     const s = document.getElementById('dashboard-start-period').value;
     const e = document.getElementById('dashboard-end-period').value;
+    localStorage.setItem('lastDashboardStart', s);
+    localStorage.setItem('lastDashboardEnd', e);
     document.getElementById('dashboard-period-display').innerText = `${s} 〜 ${e}`;
     document.getElementById('dashboard-period-panel').classList.add('hidden');
     renderDashboardKPIS(s, e);
@@ -1704,29 +1735,55 @@ window.downloadFromGoogleSheets = async function () {
                 cleanDate = d.createdAt || '';
             }
 
-            // [罠2] 日付が「Fri Jan 09 2026 00:00:00 GM」のように壊れて送られてきている場合を解析
+            // [罠2] タイムゾーンのズレ防止 & どんな書式でも完璧に読み込む最強ロジック
             if (cleanDate) {
                 // すでに綺麗な YYYY-MM-DD になっていない場合のみ処理
                 if (!/^\d{4}-\d{2}-\d{2}$/.test(cleanDate)) {
-                    // Javascriptの標準パースを試みる（" GM" などのゴミを除去）
-                    const dt = new Date(cleanDate.replace(' GM', '').trim());
-                    if (!isNaN(dt.getTime())) {
-                        const y = dt.getFullYear();
-                        const m = String(dt.getMonth() + 1).padStart(2, '0');
-                        const day = String(dt.getDate()).padStart(2, '0');
+
+                    // パターンA: GAS特有の英語フォーマット（例: Tue Feb 03 2026 00:00:00 GM）
+                    const dateMatch = cleanDate.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+(\d{4})/);
+
+                    if (dateMatch) {
+                        const monthStr = dateMatch[1];
+                        const day = String(parseInt(dateMatch[2])).padStart(2, '0');
+                        const y = dateMatch[3];
+
+                        const months = {
+                            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+                            'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+                        };
+                        const m = months[monthStr];
                         cleanDate = `${y}-${m}-${day}`;
                     } else {
-                        // それでも失敗する場合、最後の手段で正規表現で数字だけを抜き出す
-                        const match = cleanDate.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
-                        if (match) {
-                            const y = match[1];
-                            const m = String(match[2]).padStart(2, '0');
-                            const day = String(match[3]).padStart(2, '0');
-                            cleanDate = `${y}-${m}-${day}`;
+                        // パターンB: 日本語のいろんな「手入力」フォーマット（「2026/2/3」や「2月3日」）を力技で抽出
+                        const jpMatch = cleanDate.match(/(?:(\d{4})[年\/\-])?\s*(\d{1,2})[月\/\-]\s*(\d{1,2})[日\s]*/);
+                        if (jpMatch) {
+                            const nowYear = new Date().getFullYear();
+                            const y = jpMatch[1] ? parseInt(jpMatch[1]) : nowYear;
+                            // 26年などの下2桁入力対策
+                            const finalY = y < 100 ? y + 2000 : y;
+                            const m = String(parseInt(jpMatch[2])).padStart(2, '0');
+                            const day = String(parseInt(jpMatch[3])).padStart(2, '0');
+                            cleanDate = `${finalY}-${m}-${day}`;
                         } else {
-                            // 本当にどうしようもない場合は今日の日付にする
-                            const now = new Date();
-                            cleanDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                            // パターンC: 最終手段としてのJavascript標準パース
+                            const dt = new Date(cleanDate.replace(' GM', '').trim());
+                            if (!isNaN(dt.getTime())) {
+                                const y = dt.getFullYear();
+                                const m = String(dt.getMonth() + 1).padStart(2, '0');
+                                const day = String(dt.getDate()).padStart(2, '0');
+
+                                // "2/3"などで2001年になってしまう現象を防ぐ
+                                if (y < 2000) {
+                                    cleanDate = `${new Date().getFullYear()}-${m}-${day}`;
+                                } else {
+                                    cleanDate = `${y}-${m}-${day}`;
+                                }
+                            } else {
+                                // 万策尽きたら今日の日付にする（真っ白になるのを防ぐため）
+                                const now = new Date();
+                                cleanDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                            }
                         }
                     }
                 }
@@ -1781,6 +1838,11 @@ window.downloadFromGoogleSheets = async function () {
                     document.getElementById('dashboard-start-period').value = monthStr;
                     document.getElementById('dashboard-end-period').value = monthStr;
                     document.getElementById('dashboard-period-display').innerText = `${monthStr} 〜 ${monthStr}`;
+
+                    // 保存状態も上書きしておく
+                    localStorage.setItem('lastDashboardStart', monthStr);
+                    localStorage.setItem('lastDashboardEnd', monthStr);
+                    localStorage.setItem('lastListFilter', JSON.stringify(currentFilter));
                 }
             }
         }
