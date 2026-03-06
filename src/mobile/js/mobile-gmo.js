@@ -2,7 +2,7 @@
  * Mobile Dashboard Logic - Clean White Theme v4.0
  */
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwAaTNKwE6RvKUqp2ghLXIOZcRnQxPxu6DvmR-eEsUUwCP0PPDDGflMqVsLi7cZPZmT/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzLoCb-t98eSzRm8LjUE_5jneYEyN8vF8NBV_qo6uXZ9adJRkiu1ia1DMkfL8gusvxl/exec';
 
 let globalData = [];
 let chartInstance = null;
