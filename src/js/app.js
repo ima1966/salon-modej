@@ -1758,7 +1758,15 @@ window.downloadFromGoogleSheets = async function () {
 
             // [罠1] 日付が「空欄」の場合、データ作成日時(createdAt)を代用する
             if (!cleanDate || cleanDate === '') {
-                cleanDate = d.createdAt || '';
+                // Parse createdAt strictly and add +9 Hours safely
+                let cDateObj = new Date(d.createdAt);
+                if (!isNaN(cDateObj.getTime())) {
+                    // Force JST by taking UTC and adding 9 hours
+                    cDateObj.setTime(cDateObj.getTime() + (9 * 60 * 60 * 1000));
+                    cleanDate = `${cDateObj.getUTCFullYear()}-${String(cDateObj.getUTCMonth() + 1).padStart(2, '0')}-${String(cDateObj.getUTCDate()).padStart(2, '0')}`;
+                } else {
+                    cleanDate = d.createdAt || '';
+                }
             }
 
             // [罠2] タイムゾーンのズレ防止 & どんな書式でも完璧に読み込む最強ロジック
@@ -1819,7 +1827,15 @@ window.downloadFromGoogleSheets = async function () {
                 cleanDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             }
 
-            // items配列が存在しない・壊れている場合のフォールバック
+            // 万が一未来の日付（今から1年後など）が入ってしまったら現在日付にするガード
+            const maxAllowedDate = new Date();
+            maxAllowedDate.setFullYear(maxAllowedDate.getFullYear() + 1);
+            if (new Date(cleanDate) > maxAllowedDate) {
+                const now = new Date();
+                cleanDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            }
+
+            // items配列が存在しない・壊れている場合のガードフォールバック
             let items = d.items;
             if (!items && d.products) items = d.products; // 古い形式との互換
             if (!Array.isArray(items)) items = [];
@@ -1831,6 +1847,10 @@ window.downloadFromGoogleSheets = async function () {
                 totalAmount: Number(d.totalAmount) || 0
             };
         });
+
+        // ⭐ 日付の降順(新しい順)に確実にならべかえる
+        salesData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
         localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
 
         // UI用カウント更新
