@@ -15,6 +15,22 @@ let editingId = null;
 let itemCounter = 0;
 let editItemCounter = 0;
 
+function getLatestDataMonthStr() {
+    if (!salesData || salesData.length === 0) {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+    let max = salesData[0].date;
+    for (let i = 1; i < salesData.length; i++) {
+        if (salesData[i].date && salesData[i].date > max) max = salesData[i].date;
+    }
+    if (!max) {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+    return max.substring(0, 7);
+}
+
 // Chart Instances
 let charts = {
     yearly: null,
@@ -157,10 +173,10 @@ function initUI() {
                 applyPeriodFilter(parsed.periodName, true);
             }
         } catch (e) {
-            applyPeriodFilter('current-month', true);
+            applyPeriodFilter('latest-data', true);
         }
     } else {
-        applyPeriodFilter('current-month', true);
+        applyPeriodFilter('latest-data', true);
     }
 
     // ⭐ Restore Dashboard Filters Explicitly to prevent browser cache issues
@@ -170,7 +186,7 @@ function initUI() {
         document.getElementById('dashboard-start-period').value = savedDashStart;
         document.getElementById('dashboard-end-period').value = savedDashEnd;
     } else {
-        const nowM = new Date().toISOString().slice(0, 7);
+        const nowM = getLatestDataMonthStr();
         document.getElementById('dashboard-start-period').value = nowM;
         document.getElementById('dashboard-end-period').value = nowM;
     }
@@ -606,6 +622,16 @@ function applyPeriodFilter(period, silent = false) {
     } else if (period === '2months-ago') {
         start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
         end = new Date(now.getFullYear(), now.getMonth() - 1, 0);
+    } else if (period === 'latest-data') {
+        const latestM = getLatestDataMonthStr(); // e.g. "2026-02"
+        const parts = latestM.split('-');
+        if (parts.length >= 2) {
+            start = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
+            end = new Date(parseInt(parts[0]), parseInt(parts[1]), 0);
+        } else {
+            start = new Date(now.getFullYear(), now.getMonth(), 1);
+            end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        }
     }
 
     document.querySelector(`.btn-filter[data-period="${period}"]`)?.classList.add('active');
@@ -916,8 +942,8 @@ function updateDashboard() {
     let endInputStr = document.getElementById('dashboard-end-period').value;
 
     if (!startInputStr || !endInputStr) {
-        startInputStr = new Date().toISOString().slice(0, 7);
-        endInputStr = new Date().toISOString().slice(0, 7);
+        startInputStr = getLatestDataMonthStr();
+        endInputStr = startInputStr;
         document.getElementById('dashboard-start-period').value = startInputStr;
         document.getElementById('dashboard-end-period').value = endInputStr;
     }
@@ -1811,37 +1837,37 @@ window.downloadFromGoogleSheets = async function () {
         document.getElementById('local-data-count').textContent = `${salesData.length}件`;
         updateYearSelector();
 
-        // --- 【自動切り替え】データ内の最新月に合わせて表示期間を更新 ---
+        // --- 【自動切り替え】データ内の全期間に合わせて表示を更新 ---
         if (salesData.length > 0) {
             let maxDateStr = salesData[0].date;
+            let minDateStr = salesData[0].date;
             for (let i = 1; i < salesData.length; i++) {
-                if (salesData[i].date > maxDateStr) {
-                    maxDateStr = salesData[i].date;
-                }
+                if (salesData[i].date > maxDateStr) maxDateStr = salesData[i].date;
+                if (salesData[i].date && salesData[i].date < minDateStr) minDateStr = salesData[i].date;
             }
-            if (maxDateStr) {
-                const parts = maxDateStr.split('-');
-                if (parts.length >= 2) {
-                    const y = parts[0];
-                    const m = parts[1];
-                    const monthStr = `${y}-${m}`;
+            if (maxDateStr && minDateStr) {
+                const maxParts = maxDateStr.split('-');
+                const minParts = minDateStr.split('-');
 
-                    // 売上一覧の期間（カスタム）も同月に自動セット
-                    const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
-                    document.getElementById('list-period-start').value = `${monthStr}-01`;
-                    document.getElementById('list-period-end').value = `${monthStr}-${String(lastDay).padStart(2, '0')}`;
-                    currentFilter = { start: `${monthStr}-01`, end: `${monthStr}-${String(lastDay).padStart(2, '0')}`, periodName: 'custom' };
+                if (maxParts.length >= 2 && minParts.length >= 2) {
+                    const maxMonthStr = `${maxParts[0]}-${maxParts[1]}`;
+                    const minMonthStr = `${minParts[0]}-${minParts[1]}`;
+
+                    // 売上一覧の期間を全データをカバーするようにセット
+                    currentFilter = { start: null, end: null, periodName: 'all-time' };
                     document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
-                    document.getElementById('current-period-display').innerText = `期間: ${monthStr}-01 〜 ${monthStr}-${String(lastDay).padStart(2, '0')}`;
+                    document.getElementById('current-period-display').innerText = `現在の表示: 全期間`;
+                    document.getElementById('list-period-start').value = '';
+                    document.getElementById('list-period-end').value = '';
 
-                    // ダッシュボードの対象月を最新データに合わせる
-                    document.getElementById('dashboard-start-period').value = monthStr;
-                    document.getElementById('dashboard-end-period').value = monthStr;
-                    document.getElementById('dashboard-period-display').innerText = `${monthStr} 〜 ${monthStr}`;
+                    // ダッシュボードの対象月を全データ期間に合わせる
+                    document.getElementById('dashboard-start-period').value = minMonthStr;
+                    document.getElementById('dashboard-end-period').value = maxMonthStr;
+                    document.getElementById('dashboard-period-display').innerText = `${minMonthStr} 〜 ${maxMonthStr}`;
 
                     // 保存状態も上書きしておく
-                    localStorage.setItem('lastDashboardStart', monthStr);
-                    localStorage.setItem('lastDashboardEnd', monthStr);
+                    localStorage.setItem('lastDashboardStart', minMonthStr);
+                    localStorage.setItem('lastDashboardEnd', maxMonthStr);
                     localStorage.setItem('lastListFilter', JSON.stringify(currentFilter));
                 }
             }
