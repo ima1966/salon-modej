@@ -1,5 +1,5 @@
 /**
- * サロン Mode J 売上管琁E��スチE�� v14.6.01
+ * サロン Mode J 売上管理システム v14.6.02
  * Antigravity Refactored Version
  */
 
@@ -23,7 +23,7 @@ let charts = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌸 System Initializing v14.6.01 (Color: Wed/Sun Only)...');
+    console.log('🌸 System Initializing v14.6.02 (Color: Wed/Sun Only)...');
     loadData();
     initUI();
     initCharts(); // Initialize empty charts
@@ -184,28 +184,28 @@ window.addItemRow = function () {
         <div class="item-header">
             <div style="display:flex; align-items:center;">
                 <span>#${itemCounter}</span>
-                <label class="manager-check-label" title="店長拁E��E>
+                <label class="manager-check-label" title="店長担当">
                     <input type="checkbox" class="item-is-manager"> 👑
                 </label>
             </div>
-            <button type="button" class="btn-remove" onclick="removeItemRow(${itemCounter})">🗑�E�E/button>
+            <button type="button" class="btn-remove" onclick="removeItemRow(${itemCounter})">🗑️</button>
         </div>
         <div class="item-grid-row">
             <div class="form-group">
                 <select class="item-category" onchange="updateTotal()" required>
-                    <option value="">カチE��リー選抁E/option>
+                    <option value="">カテゴリー選択</option>
                     <option value="サブスクリプション">サブスク</option>
-                    <option value="会員 若よもぎ蒸ぁE>会員 よもぁE/option>
-                    <option value="非会員 若よもぎ蒸ぁE>非会員 よもぁE/option>
-                    <option value="施衁E>施衁E/option>
+                    <option value="会員 若よもぎ蒸し">会員 よもぎ</option>
+                    <option value="非会員 若よもぎ蒸し">非会員 よもぎ</option>
+                    <option value="施術">施術</option>
                     <option value="ベルマン">ベルマン</option>
                     <option value="クレンシア">クレンシア</option>
                     <option value="水素関連">水素関連</option>
-                    <option value="そ�E仁E>そ�E仁E/option>
+                    <option value="その他">その他</option>
                 </select>
             </div>
             <div class="form-group">
-                <input type="text" class="item-product" placeholder="啁E��吁E required autocomplete="off">
+                <input type="text" class="item-product" placeholder="商品名" required autocomplete="off">
             </div>
             <div class="form-group">
                 <input type="number" class="item-qty" placeholder="個数" min="1" value="" oninput="updateTotal()" required autocomplete="off">
@@ -227,7 +227,7 @@ window.removeItemRow = function (id) {
         row.remove();
         window.updateTotal();
     } else {
-        showNotification('明細は1つ以上忁E��でぁE, 'error');
+        showNotification('明細は1つ以上必要です', 'error');
     }
 }
 
@@ -259,7 +259,7 @@ function handleFormSubmit(e) {
 
     // Validation: Comma Check
     if (name.includes(',')) {
-        showNotification('お客様名にカンチE,)は使用できません', 'error');
+        showNotification('お客様名にカンマ(,)は使用できません', 'error');
         return;
     }
 
@@ -277,11 +277,11 @@ function handleFormSubmit(e) {
         const price = parseInt(row.querySelector('.item-price').value);
 
         if (!cat || !prod || !qty || isNaN(price)) {
-            showNotification('入力不備がありまぁE, 'error'); return;
+            showNotification('入力不備があります', 'error'); return;
         }
 
         if (prod.includes(',')) {
-            showNotification('啁E��名にカンチE,)は使用できません', 'error');
+            showNotification('商品名にカンマ(,)は使用できません', 'error');
             return;
         }
 
@@ -387,28 +387,28 @@ window.addEditItemRow = function () {
         <div class="item-header">
             <div style="display:flex; align-items:center;">
                 <span>#${editItemCounter}</span>
-                <label class="manager-check-label" title="店長拁E��E>
+                <label class="manager-check-label" title="店長担当">
                     <input type="checkbox" class="item-is-manager"> 👑
                 </label>
             </div>
-            <button type="button" class="btn-remove" onclick="removeEditItemRow(${editItemCounter})">🗑�E�E/button>
+            <button type="button" class="btn-remove" onclick="removeEditItemRow(${editItemCounter})">🗑️</button>
         </div>
         <div class="item-grid-row">
             <div class="form-group">
                 <select class="item-category" onchange="updateEditTotal()" required>
-                    <option value="">カチE��リー選抁E/option>
+                    <option value="">カテゴリー選択</option>
                     <option value="サブスクリプション">サブスク</option>
-                    <option value="会員 若よもぎ蒸ぁE>会員 よもぁE/option>
-                    <option value="非会員 若よもぎ蒸ぁE>非会員 よもぁE/option>
-                    <option value="施衁E>施衁E/option>
+                    <option value="会員 若よもぎ蒸し">会員 よもぎ</option>
+                    <option value="非会員 若よもぎ蒸し">非会員 よもぎ</option>
+                    <option value="施術">施術</option>
                     <option value="ベルマン">ベルマン</option>
                     <option value="クレンシア">クレンシア</option>
                     <option value="水素関連">水素関連</option>
-                    <option value="そ�E仁E>そ�E仁E/option>
+                    <option value="その他">その他</option>
                 </select>
             </div>
             <div class="form-group">
-                <input type="text" class="item-product" placeholder="啁E��吁E required autocomplete="off">
+                <input type="text" class="item-product" placeholder="商品名" required autocomplete="off">
             </div>
             <div class="form-group">
                 <input type="number" class="item-qty" placeholder="個数" min="1" value="" oninput="updateEditTotal()" required autocomplete="off">
@@ -430,7 +430,7 @@ window.removeEditItemRow = function (id) {
         row.remove();
         window.updateEditTotal();
     } else {
-        showNotification('明細は1つ以上忁E��でぁE, 'error');
+        showNotification('明細は1つ以上必要です', 'error');
     }
 }
 
@@ -461,7 +461,7 @@ function handleEditSubmit(e) {
 
     // Validation: Comma Check
     if (name.includes(',')) {
-        showNotification('お客様名にカンチE,)は使用できません', 'error');
+        showNotification('お客様名にカンマ(,)は使用できません', 'error');
         return;
     }
 
@@ -478,11 +478,11 @@ function handleEditSubmit(e) {
         const price = parseInt(row.querySelector('.item-price').value);
 
         if (!cat || !prod || !qty || isNaN(price)) {
-            showNotification('入力不備がありまぁE, 'error'); return;
+            showNotification('入力不備があります', 'error'); return;
         }
 
         if (prod.includes(',')) {
-            showNotification('啁E��名にカンチE,)は使用できません', 'error');
+            showNotification('商品名にカンマ(,)は使用できません', 'error');
             return;
         }
 
@@ -586,10 +586,10 @@ function applyPeriodFilter(period, silent = false) {
         const y = d.getFullYear();
         const m = d.getMonth() + 1;
         const dy = d.getDate();
-        const dayOfWeek = ['日', '朁E, '火', '水', '木', '釁E, '圁E][d.getDay()];
-        displayText = `${y}年${m}朁E{dy}日 (${dayOfWeek})`;
+        const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][d.getDay()];
+        displayText = `${y}年${m}月${dy}日 (${dayOfWeek})`;
         // For monthly chart title, just show month
-        document.getElementById('monthly-display-period').innerText = `(${y}年${m}朁E`;
+        document.getElementById('monthly-display-period').innerText = `(${y}年${m}月)`;
     } else if (currentFilter.start && currentFilter.end) {
         // Attempt to detect if it's a full month range for cleaner display
         const s = new Date(currentFilter.start);
@@ -606,13 +606,13 @@ function applyPeriodFilter(period, silent = false) {
             e.getDate() === new Date(s.getFullYear(), s.getMonth() + 1, 0).getDate();
 
         if (isFullMonth) {
-            displayText = `${s.getFullYear()}年${s.getMonth() + 1}朁E;
-            document.getElementById('monthly-display-period').innerText = `(${s.getFullYear()}年${s.getMonth() + 1}朁E`;
+            displayText = `${s.getFullYear()}年${s.getMonth() + 1}月`;
+            document.getElementById('monthly-display-period').innerText = `(${s.getFullYear()}年${s.getMonth() + 1}月)`;
         } else {
-            displayText = `${currentFilter.start} 、E${currentFilter.end}`;
+            displayText = `${currentFilter.start} 〜 ${currentFilter.end}`;
             // Even for custom ranges, try to show relevant month in daily chart title if close enough
             // Default to showing the month of the start date
-            document.getElementById('monthly-display-period').innerText = `(${s.getFullYear()}年${s.getMonth() + 1}朁E`;
+            document.getElementById('monthly-display-period').innerText = `(${s.getFullYear()}年${s.getMonth() + 1}月)`;
         }
     } else {
         displayText = '全期間';
@@ -631,7 +631,7 @@ function applyCustomPeriod() {
     if (s && e) {
         currentFilter = { start: s, end: e, periodName: 'custom' };
         document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
-        document.getElementById('current-period-display').innerText = `期間: ${s} 、E${e}`;
+        document.getElementById('current-period-display').innerText = `期間: ${s} 〜 ${e}`;
         renderSalesList();
 
         // Charts: Use the END date of the range to show the most recent relevant data
@@ -687,28 +687,28 @@ function renderSalesList() {
     // Render Table
     const container = document.getElementById('sales-list-container');
     if (filtered.length === 0) {
-        container.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">チE�Eタがありません</div>';
+        container.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">データがありません</div>';
         return;
     }
 
     const getSortIcon = (key) => {
-        if (currentSort.key !== key) return '<span style="opacity:0.3">⇁E/span>';
+        if (currentSort.key !== key) return '<span style="opacity:0.3">⇅</span>';
         return currentSort.order === 'asc' ? '▲' : '▼';
     };
 
     let html = `<table class="styled-table"><thead><tr>
-        <th class="sortable" onclick="sortSalesList('date')" style="cursor:pointer">日仁E${getSortIcon('date')}</th>
+        <th class="sortable" onclick="sortSalesList('date')" style="cursor:pointer">日付 ${getSortIcon('date')}</th>
         <th>曜日</th>
         <th class="sortable" onclick="sortSalesList('customer')" style="cursor:pointer">お客様名 ${getSortIcon('customer')}</th>
-        <th class="sortable text-right" onclick="sortSalesList('amount')" style="cursor:pointer">金顁E${getSortIcon('amount')}</th>
-        <th class="sortable" onclick="sortSalesList('payment')" style="cursor:pointer">決渁E${getSortIcon('payment')}</th>
-        <th>操佁E/th>
+        <th class="sortable text-right" onclick="sortSalesList('amount')" style="cursor:pointer">金額 ${getSortIcon('amount')}</th>
+        <th class="sortable" onclick="sortSalesList('payment')" style="cursor:pointer">決済 ${getSortIcon('payment')}</th>
+        <th>操作</th>
     </tr></thead><tbody>`;
 
     filtered.forEach(sale => {
         // Details HTML for Tooltip
         const detailsHtml = sale.items.map(i => {
-            const isMan = i.isManager ? '<span title="店長拁E��E>👑</span>' : '';
+            const isMan = i.isManager ? '<span title="店長担当">👑</span>' : '';
             return `
                 <div style="display:flex; justify-content:space-between; margin-bottom:6px; border-bottom:1px dashed #eee; padding-bottom:4px;">
                     <div style="display:flex; flex-direction:column; line-height:1.2;">
@@ -722,7 +722,7 @@ function renderSalesList() {
 
         const dateObj = new Date(sale.date);
         const dayIdx = dateObj.getDay();
-        const dayStr = ['日', '朁E, '火', '水', '木', '釁E, '圁E][dayIdx];
+        const dayStr = ['日', '月', '火', '水', '木', '金', '土'][dayIdx];
 
         // CSS Classes for Row Styling
         let rowClass = '';
@@ -743,10 +743,10 @@ function renderSalesList() {
                             <div class="detail-tooltip">
                                 <div style="font-size:0.8rem; font-weight:bold; margin-bottom:8px; border-bottom:1px solid #ddd; padding-bottom:4px; color:#555;">明細 (${sale.items.length}点)</div>
                                 ${detailsHtml}
-                                <div style="text-align:right; font-weight:bold; font-size:0.9rem; margin-top:8px; color:#4f46e5;">合訁E ¥${sale.totalAmount.toLocaleString()}</div>
+                                <div style="text-align:right; font-weight:bold; font-size:0.9rem; margin-top:8px; color:#4f46e5;">合計: ¥${sale.totalAmount.toLocaleString()}</div>
                             </div>
                         </div>
-                        <button class="btn-secondary btn-sm" onclick="editSale('${sale.id}')">編雁E/button>
+                        <button class="btn-secondary btn-sm" onclick="editSale('${sale.id}')">編集</button>
                         <button class="btn-danger btn-sm" onclick="deleteSale('${sale.id}')">削除</button>
                     </div>
                 </td>
@@ -790,7 +790,7 @@ function initCharts() {
     const ctxYear = document.getElementById('yearlySalesChart').getContext('2d');
     charts.yearly = new Chart(ctxYear, {
         type: 'bar',
-        data: { labels: [], datasets: [{ label: '売丁E, data: [], backgroundColor: '#667eea', borderRadius: 4 }] },
+        data: { labels: [], datasets: [{ label: '売上', data: [], backgroundColor: '#667eea', borderRadius: 4 }] },
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -805,7 +805,7 @@ function initCharts() {
                     renderCharts(year, index);
 
                     // Update display text
-                    document.getElementById('monthly-display-period').innerText = `(${year}年${index + 1}朁E`;
+                    document.getElementById('monthly-display-period').innerText = `(${year}年${index + 1}月)`;
                 }
             },
             onHover: (event, chartElement) => {
@@ -817,7 +817,7 @@ function initCharts() {
     const ctxMonth = document.getElementById('monthlyDailyChart').getContext('2d');
     charts.monthly = new Chart(ctxMonth, {
         type: 'bar',
-        data: { labels: [], datasets: [{ label: '売丁E, data: [], backgroundColor: '#764ba2', borderRadius: 4 }] },
+        data: { labels: [], datasets: [{ label: '売上', data: [], backgroundColor: '#764ba2', borderRadius: 4 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
@@ -825,7 +825,7 @@ function initCharts() {
     charts.paymentPie = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-            labels: ['現釁E, '振込', 'カーチE],
+            labels: ['現金', '振込', 'カード'],
             datasets: [{
                 data: [0, 0, 0],
                 backgroundColor: ['#10b981', '#f59e0b', '#667eea'],
@@ -840,7 +840,7 @@ function initCharts() {
         type: 'line',
         data: {
             labels: [], datasets: [{
-                label: '売丁E, data: [], borderColor: '#667eea', tension: 0.3, fill: true, backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                label: '売上', data: [], borderColor: '#667eea', tension: 0.3, fill: true, backgroundColor: 'rgba(102, 126, 234, 0.1)'
             }]
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
@@ -882,7 +882,7 @@ function updateDashboard() {
     if (!document.getElementById('dashboard-start-period').value) {
         document.getElementById('dashboard-start-period').value = startStr;
         document.getElementById('dashboard-end-period').value = endStr;
-        document.getElementById('dashboard-period-display').innerText = `${startStr} 、E${endStr}`;
+        document.getElementById('dashboard-period-display').innerText = `${startStr} 〜 ${endStr}`;
     }
 
     renderDashboardKPIS(startStr, endStr);
@@ -974,7 +974,7 @@ function renderCharts(year, month) {
     });
 
     if (charts.yearly) {
-        charts.yearly.data.labels = ['1朁E, '2朁E, '3朁E, '4朁E, '5朁E, '6朁E, '7朁E, '8朁E, '9朁E, '10朁E, '11朁E, '12朁E];
+        charts.yearly.data.labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
         charts.yearly.data.datasets[0].data = monthlyTotals;
         charts.yearly.update();
     }
@@ -1047,7 +1047,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     const [yNum, mNum] = startMonthStr.split('-');
     if (yNum && mNum) {
         const titleEl = document.getElementById('daily-trend-title');
-        if (titleEl) titleEl.textContent = `${yNum}年${mNum}朁E日別売上トレンド`;
+        if (titleEl) titleEl.textContent = `${yNum}年${mNum}月 日別売上トレンド`;
     }
 
     const startDate = new Date(startMonthStr + '-01');
@@ -1064,8 +1064,8 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     let totalSales = 0;
     let transactions = 0;
     let customers = new Set();
-    let paymentCounts = { '現釁E: 0, '振込': 0, 'クレジチE��カーチE: 0 };
-    let paymentAmounts = { '現釁E: 0, '振込': 0, 'クレジチE��カーチE: 0 };
+    let paymentCounts = { '現金': 0, '振込': 0, 'クレジットカード': 0 };
+    let paymentAmounts = { '現金': 0, '振込': 0, 'クレジットカード': 0 };
     const dailyMap = {};
     const dailyCountMap = {}; // Transactions (Total Items)
     const dailyCustomerMap = {}; // Unique Customers (Set)
@@ -1137,7 +1137,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
             .sort((a, b) => b.sales - a.sales);
 
         if (sortedCats.length === 0) {
-            mgrCatBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999; padding:20px;">チE�EタなぁE/td></tr>';
+            mgrCatBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999; padding:20px;">データなし</td></tr>';
         } else {
             let html = '';
             sortedCats.forEach(c => {
@@ -1161,7 +1161,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     document.getElementById('average-customer-spending').textContent = customers.size ? '¥' + Math.floor(totalSales / customers.size).toLocaleString() : '¥0';
 
     // Matrix Table & Pie Chart
-    const methods = ['現釁E, '振込', 'クレジチE��カーチE];
+    const methods = ['現金', '振込', 'クレジットカード'];
     let matrixHtml = '';
     methods.forEach(m => {
         const count = paymentCounts[m];
@@ -1182,7 +1182,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     document.getElementById('payment-matrix-body').innerHTML = matrixHtml;
 
     if (charts.paymentPie) {
-        charts.paymentPie.data.datasets[0].data = [paymentAmounts['現釁E], paymentAmounts['振込'], paymentAmounts['クレジチE��カーチE]];
+        charts.paymentPie.data.datasets[0].data = [paymentAmounts['現金'], paymentAmounts['振込'], paymentAmounts['クレジットカード']];
         charts.paymentPie.update();
     }
 
@@ -1260,14 +1260,14 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     let tableHtml = `
         <thead>
             <tr>
-                <th class="sortable" onclick="sortDashboard('date')" style="cursor:pointer">日仁E${getIcon('date')}</th>
+                <th class="sortable" onclick="sortDashboard('date')" style="cursor:pointer">日付 ${getIcon('date')}</th>
                 <th>曜日</th>
-                <th class="sortable text-right" onclick="sortDashboard('sales')" style="cursor:pointer">売丁E${getIcon('sales')}</th>
+                <th class="sortable text-right" onclick="sortDashboard('sales')" style="cursor:pointer">売上 ${getIcon('sales')}</th>
                 <th class="text-right">顧客数</th>
                 <th class="sortable text-right" onclick="sortDashboard('count')" style="cursor:pointer">件数 ${getIcon('count')}</th>
-                <th class="text-right">前日毁E/th>
-                <th class="text-right">7日平坁E/th>
-                <th class="text-right">30日平坁E/th>
+                <th class="text-right">前日比</th>
+                <th class="text-right">7日平均</th>
+                <th class="text-right">30日平均</th>
             </tr>
         </thead>
         <tbody>`;
@@ -1275,7 +1275,7 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     tableData.forEach(day => {
         const dateObj = new Date(day.date);
         const dayOfWeekIdx = dateObj.getDay();
-        const dayOfWeek = ['日', '朁E, '火', '水', '木', '釁E, '圁E][dayOfWeekIdx];
+        const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][dayOfWeekIdx];
 
         let rowClass = '';
         if (dayOfWeekIdx === 0 || dayOfWeekIdx === 3) rowClass = 'row-red'; // Sun or Wed
@@ -1372,7 +1372,7 @@ function renderRankings(type, count = 5, data = null) {
 
     let html = '';
     sorted.forEach((item, index) => {
-        const medal = index === 0 ? '🥁E : index === 1 ? '🥁E : index === 2 ? '🥁E : `${index + 1}`;
+        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`;
 
         let bgStyle = 'background: white;';
         if (index === 0) bgStyle = 'background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);';
@@ -1398,12 +1398,12 @@ function renderRankings(type, count = 5, data = null) {
             <div class="ranking-item" style="${bgStyle}">
                 <div class="ranking-rank">${medal}</div>
                 ${infoHtml}
-                <div class="ranking-count" style="font-size:0.8em; color:#666; margin-right:8px;">${item.count}${type === 'customer' ? '囁E : '件'}</div>
+                <div class="ranking-count" style="font-size:0.8em; color:#666; margin-right:8px;">${item.count}${type === 'customer' ? '回' : '件'}</div>
                 <div class="ranking-val">¥${item.sales.toLocaleString()}</div>
             </div>
         `;
     });
-    container.innerHTML = html || '<div class="text-muted text-center p-2">チE�EタなぁE/div>';
+    container.innerHTML = html || '<div class="text-muted text-center p-2">データなし</div>';
 }
 
 
@@ -1455,14 +1455,14 @@ function applyQuickPeriod(type) {
 function applyDashboardPeriod() {
     const s = document.getElementById('dashboard-start-period').value;
     const e = document.getElementById('dashboard-end-period').value;
-    document.getElementById('dashboard-period-display').innerText = `${s} 、E${e}`;
+    document.getElementById('dashboard-period-display').innerText = `${s} 〜 ${e}`;
     document.getElementById('dashboard-period-panel').classList.add('hidden');
     renderDashboardKPIS(s, e);
 }
 
 // --- Utils ---
 window.exportToCSV = function () {
-    const header = ['日仁E, 'お客様名', 'カチE��リー', '啁E��吁E, '個数', '単価', '小訁E, '合計��顁E, '決済方況E];
+    const header = ['日付', 'お客様名', 'カテゴリー', '商品名', '個数', '単価', '小計', '合計金額', '決済方法'];
     let csvContent = '\uFEFF' + header.join(',') + '\n';
 
     salesData.forEach(sale => {
@@ -1489,7 +1489,7 @@ window.exportToCSV = function () {
     link.download = `sales_export_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     URL.revokeObjectURL(url);
-    showNotification('CSVを�E力しました');
+    showNotification('CSVを出力しました');
 };
 
 window.editSale = function (id) {
@@ -1526,13 +1526,13 @@ window.editSale = function (id) {
 
     } else {
         console.error('Sale not found:', id);
-        showNotification('チE�Eタが見つかりません', 'error');
+        showNotification('データが見つかりません', 'error');
     }
 }
 
 window.deleteSale = function (id) {
     console.log('Delete sale requested:', id);
-    if (confirm('削除しますか�E�E)) {
+    if (confirm('削除しますか？')) {
         salesData = salesData.filter(s => s.id !== id);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
         updateDashboard();
@@ -1541,12 +1541,12 @@ window.deleteSale = function (id) {
 }
 
 window.deleteAllData = function () {
-    if (confirm('全チE�Eタを削除しますか�E�E(LocalStorageのみ)')) {
+    if (confirm('全データを削除しますか？ (LocalStorageのみ)')) {
         salesData = [];
         localStorage.removeItem(STORAGE_KEY);
         updateDashboard();
         document.getElementById('local-data-count').textContent = '0件';
-        showNotification('全チE�Eタを削除しました');
+        showNotification('全データを削除しました');
     }
 }
 
@@ -1568,8 +1568,8 @@ window.sendToGoogleSheets = function (data) {
         .then(res => res.json())
         .then(json => {
             if (json.status === 'success') {
-                console.log('☁E��ECloud Auto-Save Success');
-                showNotification('クラウド保存完亁E, 'info');
+                console.log('☁️ Cloud Auto-Save Success');
+                showNotification('クラウド保存完了', 'info');
             } else {
                 console.error('Cloud Error:', json);
                 showNotification('クラウド保存エラー: ' + (json.message || 'unknown'), 'error');
@@ -1577,13 +1577,13 @@ window.sendToGoogleSheets = function (data) {
         })
         .catch(e => {
             console.error('Cloud Network Error:', e);
-            showNotification('クラウド保存失敁E(オフライン)', 'error');
+            showNotification('クラウド保存失敗 (オフライン)', 'error');
         });
 };
 
 window.importToGoogleSheets = function () {
-    if (!salesData.length) { showNotification('チE�Eタがありません', 'error'); return; }
-    if (!confirm(`Localの${salesData.length}件をGoogleSheetsに一括送信しますか�E�`)) return;
+    if (!salesData.length) { showNotification('データがありません', 'error'); return; }
+    if (!confirm(`Localの${salesData.length}件をGoogleSheetsに一括送信しますか？`)) return;
 
     showNotification('一括送信中...', 'info');
 
@@ -1607,14 +1607,14 @@ window.importToGoogleSheets = function () {
             data: payload
         })
     }).then(() => {
-        showNotification('送信リクエスト完亁E(非同朁E');
+        showNotification('送信リクエスト完了 (非同期)');
     }).catch(e => {
         showNotification('送信エラー: ' + e, 'error');
     });
 };
 
 window.clearCloudData = function () {
-    if (!confirm('【重要】\nGoogle Sheets上�E全チE�Eタを削除します、En本当によろしいですか�E�E)) return;
+    if (!confirm('【重要】\nGoogle Sheets上の全データを削除します。\n本当によろしいですか？')) return;
 
     showNotification('クラウド削除中...', 'info');
 
@@ -1627,7 +1627,7 @@ window.clearCloudData = function () {
         // Since no-cors, we can't see the response, but assume sent.
         // It takes a moment for GAS to process.
         setTimeout(() => {
-            showNotification('送信完亁E クラウドデータ削除リクエスチE, 'success');
+            showNotification('送信完了: クラウドデータ削除リクエスト', 'success');
         }, 1000);
     }).catch(e => {
         showNotification('通信エラー: ' + e, 'error');
@@ -1638,9 +1638,9 @@ window.testGASConnection = function () {
     fetch(GAS_URL + '?action=test')
         .then(res => res.json())
         .then(data => {
-            alert('接続�E劁E ' + JSON.stringify(data));
+            alert('接続成功: ' + JSON.stringify(data));
         })
-        .catch(e => alert('接続失敁E ' + e));
+        .catch(e => alert('接続失敗: ' + e));
 }
 
 function formatDateISO(date) {
@@ -1662,9 +1662,9 @@ function showNotification(msg, type = 'success') {
 }
 
 window.downloadFromGoogleSheets = async function () {
-    if (!confirm('【警告】\nGoogle SheetsのチE�Eタでアプリ冁E�EチE�Eタを上書きします、Enアプリ冁E��編雁E��の未保存データは失われます、Enよろしいですか�E�E)) return;
+    if (!confirm('【警告】\nGoogle Sheetsのデータでアプリ内のデータを上書きします。\nアプリ内で編集中の未保存データは失われます。\nよろしいですか？')) return;
 
-    showNotification('チE�Eタを取得中...', 'info');
+    showNotification('データを取得中...', 'info');
 
     try {
         // GET request to GAS (must support CORS)
@@ -1686,7 +1686,6 @@ window.downloadFromGoogleSheets = async function () {
         }
 
         salesData = data.map(d => {
-            // Fix: Store as YYYY-MM-DD string to avoid timezone/filter issues on mobile
             let cleanDate = d.date || '';
 
             // [Trap 1] If date is blank, use createdAt as fallback
@@ -1730,10 +1729,10 @@ window.downloadFromGoogleSheets = async function () {
         updateYearSelector();
         document.getElementById('local-data-count').textContent = `${salesData.length}件`;
 
-        showNotification(`復允E��亁E ${salesData.length}件のチE�Eタをロードしました`);
+        showNotification(`復元完了: ${salesData.length}件のデータをロードしました`);
 
     } catch (e) {
         console.error('Download Error:', e);
-        showNotification('チE�Eタの取得に失敗しました、EASコーチECORS対忁Eを確認してください、E, 'error');
+        showNotification('データの取得に失敗しました。GASコード(CORS対応)を確認してください。', 'error');
     }
 }
