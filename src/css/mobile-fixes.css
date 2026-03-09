@@ -73,4 +73,22 @@
         min-width: 500px;
         /* Force horizontal scroll */
     }
+
+    /* 防止：グリッドやFlexの横幅爆発による画面の表示崩れを防ぐ（安全な範囲のみ） */
+    .kpi-grid,
+    .analysis-grid,
+    .rankings-grid {
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Chart.js のキャンバスが親より大きくなるのを防ぐ */
+    .chart-wrapper-circle,
+    .chart-wrapper-wide,
+    .chart-container-small {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden;
+    }
 }
