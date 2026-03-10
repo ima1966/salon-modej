@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>サロン Mode J 売上管理システム v14.6</title>
+    <title>サロン Mode J 売上管理システム v14.07.00</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -22,7 +22,7 @@
     <div class="app-container">
         <header class="main-header">
             <div class="header-content">
-                <h1>🌸 サロン Mode J 売上管理システム <span class="version-badge">v14.6.02</span></h1>
+                <h1>🌸 サロン Mode J 売上管理システム <span class="version-badge">v14.07.00</span></h1>
             </div>
             <nav class="main-nav">
                 <button class="nav-btn active" data-tab="input">📝 売上入力</button>
@@ -49,7 +49,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="customer-name">お客様名 <span class="required">*</span></label>
-                                    <input type="text" id="customer-name" placeholder="例: 山田様" required>
+                                    <input type="text" id="customer-name" placeholder="例: 山田様" list="customer-list" required autocomplete="off">
                                 </div>
                             </div>
                         </div>
@@ -219,7 +219,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="edit-customer-name">お客様名 <span class="required">*</span></label>
-                                        <input type="text" id="edit-customer-name" placeholder="例: 山田様" required>
+                                        <input type="text" id="edit-customer-name" placeholder="例: 山田様" list="customer-list" required autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -499,7 +499,7 @@
                         <h3>ℹ️ システム情報</h3>
                         <div class="setting-item">
                             <label>バージョン</label>
-                            <div class="value">v14.6.02 (Antigravity Enhanced)</div>
+                            <div class="value">v14.07.00 (Antigravity Enhanced)</div>
                         </div>
                         <div class="setting-item">
                             <label>最終更新</label>
