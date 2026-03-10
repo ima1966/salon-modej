@@ -1,5 +1,5 @@
-/**
- * サロン Mode J 売上管理システム v14.6.02
+﻿/**
+ * サロン Mode J 売上管理システム v14.07.00
  * Antigravity Refactored Version
  */
 
@@ -23,10 +23,11 @@ let charts = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌸 System Initializing v14.6.02 (Color: Wed/Sun Only)...');
+    console.log('🌸 System Initializing v14.07.00 (Color: Wed/Sun Only)...');
     loadData();
     initUI();
     initCharts(); // Initialize empty charts
+    updateDataLists(); // Initialize datalists
     updateDashboard(); // Render everything
 });
 
@@ -157,6 +158,7 @@ function initUI() {
     document.getElementById('cancel-edit-btn').addEventListener('click', () => {
         document.getElementById('sales-edit-view').classList.add('hidden');
         document.getElementById('sales-list-view').classList.remove('hidden');
+        document.getElementById('edit-items-container').innerHTML = ''; // BugFix: clear residual rows
     });
     document.querySelectorAll('.edit-payment-option').forEach(opt => {
         opt.addEventListener('click', () => selectEditPaymentMethod(opt));
@@ -205,7 +207,7 @@ window.addItemRow = function () {
                 </select>
             </div>
             <div class="form-group">
-                <input type="text" class="item-product" placeholder="商品名" required autocomplete="off">
+                <input type="text" class="item-product" placeholder="商品名" list="product-list" required autocomplete="off">
             </div>
             <div class="form-group">
                 <input type="number" class="item-qty" placeholder="個数" min="1" value="" oninput="updateTotal()" required autocomplete="off">
@@ -233,7 +235,7 @@ window.removeItemRow = function (id) {
 
 window.updateTotal = function () {
     let total = 0;
-    document.querySelectorAll('.item-row').forEach(row => {
+    document.querySelectorAll('#items-container .item-row').forEach(row => {
         const qty = parseInt(row.querySelector('.item-qty').value) || 0;
         const price = parseInt(row.querySelector('.item-price').value) || 0;
         const sub = qty * price;
@@ -269,7 +271,7 @@ function handleFormSubmit(e) {
     let items = [];
     let totalAmount = 0;
 
-    const rows = document.querySelectorAll('.item-row');
+    const rows = document.querySelectorAll('#items-container .item-row');
     for (let row of rows) {
         const cat = row.querySelector('.item-category').value;
         const prod = row.querySelector('.item-product').value;
@@ -408,7 +410,7 @@ window.addEditItemRow = function () {
                 </select>
             </div>
             <div class="form-group">
-                <input type="text" class="item-product" placeholder="商品名" required autocomplete="off">
+                <input type="text" class="item-product" placeholder="商品名" list="product-list" required autocomplete="off">
             </div>
             <div class="form-group">
                 <input type="number" class="item-qty" placeholder="個数" min="1" value="" oninput="updateEditTotal()" required autocomplete="off">
@@ -1736,3 +1738,37 @@ window.downloadFromGoogleSheets = async function () {
         showNotification('データの取得に失敗しました。GASコード(CORS対応)を確認してください。', 'error');
     }
 }
+
+// --- Autocomplete Lists Updates ---
+window.updateDataLists = function () {
+    const customerList = document.getElementById('customer-list');
+    const productList = document.getElementById('product-list');
+
+    // Inject if not present
+    if (!customerList) {
+        document.body.insertAdjacentHTML('beforeend', '<datalist id="customer-list"></datalist>');
+    }
+    if (!productList) {
+        document.body.insertAdjacentHTML('beforeend', '<datalist id="product-list"></datalist>');
+    }
+
+    if (!salesData || salesData.length === 0) return;
+
+    let customers = new Set();
+    let products = new Set();
+
+    salesData.forEach(sale => {
+        if (sale.customerName) customers.add(sale.customerName);
+        if (sale.items && Array.isArray(sale.items)) {
+            sale.items.forEach(item => {
+                if (item.productName) products.add(item.productName);
+            });
+        }
+    });
+
+    const cl = document.getElementById('customer-list');
+    const pl = document.getElementById('product-list');
+
+    if (cl) cl.innerHTML = Array.from(customers).map(c => '<option value="' + c + '"></option>').join('');
+    if (pl) pl.innerHTML = Array.from(products).map(p => '<option value="' + p + '"></option>').join('');
+};
