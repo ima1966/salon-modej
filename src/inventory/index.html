@@ -1,0 +1,345 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>在庫管理システム - stockMaster</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Local CSS with cache busting -->
+    <link rel="stylesheet" href="css/style.css?v=inv3">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content-stacked">
+                <h1 class="header-title">
+                    🌸 サロン Mode J 在庫管理システム <span class="version-badge">v14.07.00</span>
+                    <button id="btnSnapshot" class="btn-snapshot" title="月末棚卸締め"
+                        style="margin-left: 10px; font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; background: #f59e0b; color: white; border: none; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: bold;">
+                        <i class="fa-solid fa-file-contract"></i> 締め処理
+                    </button>
+                </h1>
+
+                <!-- Search Bar -->
+                <div class="search-bar-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="商品名・コードで検索..." autocomplete="off">
+                </div>
+
+                <!-- Manufacturer Filters -->
+                <div class="manufacturer-filters">
+                    <button class="filter-btn active" data-manu="all">全て</button>
+                    <button class="filter-btn" data-manu="若よもぎ蒸し">若よもぎ蒸し</button>
+                    <button class="filter-btn" data-manu="ベルマン">ベルマン</button>
+                    <button class="filter-btn" data-manu="クレンシア">クレンシア</button>
+                    <button class="filter-btn" data-manu="水素協会">水素協会</button>
+                    <button class="filter-btn" data-manu="ビューティーガレージ">ビューティーガレージ</button>
+                    <button class="filter-btn" data-manu="BIDEN">BIDEN</button>
+                    <button class="filter-btn" data-manu="その他">その他</button>
+                </div>
+
+                <!-- Sub Category Filter (Dynamic) -->
+                <div id="categoryFilterContainer" class="sub-filter-container hidden">
+                    <!-- Buttons will be injected here via JS -->
+                </div>
+
+                <!-- View Toggle Buttons -->
+                <div class="view-toggle-container">
+                    <button class="view-btn active" data-view="grid">
+                        <i class="fa-solid fa-border-all"></i> タイル
+                    </button>
+                    <button class="view-btn" data-view="table">
+                        <i class="fa-solid fa-table-list"></i> テーブル
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content" id="inventoryList">
+            <!-- Loading State -->
+            <div class="loading-state">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>在庫データを読み込んでいます...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state hidden">
+                <i class="fa-solid fa-box-open"></i>
+                <p>在庫データが見つかりません</p>
+            </div>
+
+            <!-- Items injected by JS -->
+        </main>
+
+        <!-- Floating Action Button -->
+        <button class="fab" id="fabAddStock">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-target="home">
+                <i class="fa-solid fa-list-ul"></i>
+                <span>一覧</span>
+            </a>
+            <a href="#" class="nav-item" data-target="history">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>履歴</span>
+            </a>
+            <a href="#" class="nav-item" data-target="scanner">
+                <i class="fa-solid fa-barcode"></i>
+                <span>スキャン</span>
+            </a>
+            <a href="#" class="nav-item" data-target="settings">
+                <i class="fa-solid fa-gear"></i>
+                <span>設定</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="registerModal" class="modal-overlay hidden">
+        <div class="modal-content bottom-sheet">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-box"></i> 新規商品登録</h3>
+                <button class="close-modal" id="closeRegisterModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:20px; font-size:0.9rem; color:#6b7280; text-align:center;">
+                    <span class="required-badge">必須</span> の項目は必ず入力してください。
+                </p>
+                <form id="registerForm" autocomplete="off">
+                    <!-- 1. Manufacturer (Select) -->
+                    <div class="form-group">
+                        <label for="regManufacturer">メーカー名 <span class="required-badge">必須</span></label>
+                        <select id="regManufacturer" class="form-control" style="background-image:none;">
+                            <option value="若よもぎ蒸し">若よもぎ蒸し</option>
+                            <option value="ベルマン">ベルマン</option>
+                            <option value="クレンシア">クレンシア</option>
+                            <option value="水素協会">水素協会</option>
+                            <option value="ビューティーガレージ">ビューティーガレージ</option>
+                            <option value="BIDEN">BIDEN</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+
+                    <!-- 2. Category -->
+                    <div class="form-group">
+                        <label for="regCategory">品目 (カテゴリ) <span class="required-badge">必須</span></label>
+                        <input type="text" id="regCategory" class="form-control" placeholder="例: シャンプー">
+                    </div>
+
+                    <!-- 3. Name (4 Fields) -->
+                    <div class="form-group">
+                        <label>商品名 (構成) <span class="required-badge">必須</span></label>
+                        <input type="text" id="regName1" class="form-control mb-2"
+                            placeholder="1. シリーズ・ブランド名 (例: オージュア)">
+                        <input type="text" id="regName2" class="form-control mb-2" placeholder="2. 商品名 (例: イミュライズ)">
+                        <input type="text" id="regName3" class="form-control mb-2" placeholder="3. 種類・タイプ (例: シャンプー)">
+                        <input type="text" id="regName4" class="form-control" placeholder="4. 容量・規格 (例: 500ml)">
+                    </div>
+
+                    <!-- 4. Model (Optional) -->
+                    <div class="form-group">
+                        <label for="regModel">型番 <span class="optional-badge">任意</span></label>
+                        <input type="text" id="regModel" class="form-control" placeholder="例: IMP-1234">
+                    </div>
+
+                    <!-- 5. Quantity (Required) -->
+                    <div class="form-group">
+                        <label for="regQuantity">数量 (個数) <span
+                                style="font-size:0.8em; color:#6b7280; font-weight:normal;">※未入力は0になります</span></label>
+                        <input type="number" id="regQuantity" class="form-control" placeholder="0">
+                    </div>
+
+                    <!-- 6. Price (Required) -->
+                    <div class="form-group">
+                        <label>定価 (税込) <span class="required-badge">必須</span></label>
+                        <input type="number" id="regPrice" class="form-control" placeholder="例: 3800">
+                    </div>
+
+                    <!-- 7. Arrival Date -->
+                    <div class="form-group">
+                        <label for="regDate">入荷日 <span class="required-badge">必須</span></label>
+                        <input type="date" id="regDate" class="form-control">
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="btn-primary" id="btnRegisterSubmit">登録する</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal (Enhanced) -->
+    <div id="editModal" class="modal-overlay hidden">
+        <div class="modal-content bottom-sheet">
+            <div class="modal-header">
+                <h3>商品詳細・編集</h3>
+                <button class="close-modal" id="closeEditModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editItemId">
+
+                <!-- Use Tabs or Scroll for easier editing -->
+                <div style="max-height: 60vh; overflow-y: auto; padding-right: 5px;">
+
+                    <!-- Edit Manufacturer -->
+                    <div class="form-group">
+                        <label>メーカー名</label>
+                        <select id="editManufacturer" class="form-control">
+                            <option value="若よもぎ蒸し">若よもぎ蒸し</option>
+                            <option value="ベルマン">ベルマン</option>
+                            <option value="クレンシア">クレンシア</option>
+                            <option value="水素協会">水素協会</option>
+                            <option value="ビューティーガレージ">ビューティーガレージ</option>
+                            <option value="BIDEN">BIDEN</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+
+                    <!-- Edit Category -->
+                    <div class="form-group">
+                        <label>カテゴリ</label>
+                        <input type="text" id="editCategory" class="form-control">
+                    </div>
+
+                    <!-- Edit Name (4 fields) -->
+                    <div class="form-group">
+                        <label>商品名</label>
+                        <input type="text" id="editName1" class="form-control mb-2" placeholder="1. シリーズ">
+                        <input type="text" id="editName2" class="form-control mb-2" placeholder="2. 商品名">
+                        <input type="text" id="editName3" class="form-control mb-2" placeholder="3. 種類">
+                        <input type="text" id="editName4" class="form-control" placeholder="4. 容量">
+                    </div>
+
+                    <!-- Moved: Model (型番) -->
+                    <div class="form-group">
+                        <label>型番</label>
+                        <input type="text" id="editModel" class="form-control">
+                    </div>
+
+                    <!-- Stock Control (Direct Input Enabled) -->
+                    <div class="current-stock-display" style="margin: 20px 0;">
+                        <span class="label">現在の在庫数</span>
+                        <div
+                            style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:10px;">
+                            <button class="control-btn" id="btnDecrease"><i class="fa-solid fa-minus"></i></button>
+                            <input type="number" id="editStockInput" class="form-control"
+                                style="width:120px; text-align:center; font-size:1.5rem; font-weight:bold; padding:5px;"
+                                value="0">
+                            <button class="control-btn" id="btnIncrease"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPrice">定価 (税込)</label>
+                        <input type="number" id="editPrice" class="form-control">
+                    </div>
+                </div>
+
+                <div class="action-buttons" style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="btn-danger" id="btnDeleteItem"
+                        style="flex:1; background:#ef4444; color:white; border:none; border-radius:12px; font-weight:bold; padding:16px;">削除</button>
+                    <button id="btnCopyItem"
+                        style="flex:1; background:#10b981; color:white; border:none; border-radius:12px; font-weight:bold; padding:16px;">
+                        <i class="fa-solid fa-copy"></i> 複製
+                    </button>
+                    <button class="btn-primary" id="btnUpdateItem" style="flex:2;">保存する</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duplicate Check Modal -->
+    <div id="duplicateConfirmModal" class="modal-overlay hidden" style="align-items: center;">
+        <div class="modal-content"
+            style="background:white; width:90%; max-width:400px; border-radius:20px; padding:24px; text-align:center;">
+            <div style="font-size:3rem; color:#f59e0b; margin-bottom:16px;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 style="margin:0 0 12px 0; font-size:1.2rem;">重複の可能性があります</h3>
+            <p style="color:#4b5563; font-size:0.95rem; margin-bottom:20px;">
+                以下の商品と名前または型番が一致しています。<br>
+                <strong id="dupItemName" style="color:#1f2937;"></strong>
+            </p>
+
+            <div style="background:#f3f4f6; padding:12px; border-radius:12px; margin-bottom:24px; text-align:left;">
+                <div style="font-size:0.85rem; color:#6b7280;">既存の在庫数</div>
+                <div style="font-size:1.5rem; font-weight:bold; color:#1f2937;">
+                    <span id="dupCurrentStock">0</span> <span style="font-size:0.9rem;">個</span>
+                </div>
+                <div style="text-align:center; color:#6366f1; margin:8px 0;"><i class="fa-solid fa-plus"></i></div>
+                <div style="font-size:0.85rem; color:#6b7280;">追加する数量</div>
+                <div style="font-size:1.5rem; font-weight:bold; color:#10b981;">
+                    <span id="dupNewStock">0</span> <span style="font-size:0.9rem;">個</span>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button id="btnMergeStock" class="btn-primary" style="background:#6366f1;">
+                    統合して在庫を追加する
+                </button>
+                <button id="btnRegisterAnyway"
+                    style="padding:12px; border:2px solid #e5e7eb; background:white; color:#4b5563; border-radius:12px; font-weight:600; cursor:pointer;">
+                    別商品として新規登録
+                </button>
+                <button id="btnCancelDup"
+                    style="padding:12px; border:none; background:transparent; color:#6b7280; font-size:0.9rem; cursor:pointer; text-decoration:underline;">
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Snapshot Date Modal -->
+    <div id="snapshotModal" class="modal-overlay hidden"
+        style="align-items: center; justify-content: center; display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; background: rgba(0,0,0,0.5);">
+        <div class="modal-content"
+            style="background:white; width:90%; max-width:320px; border-radius:16px; padding:24px; text-align:center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <div style="font-size:3rem; color:#f59e0b; margin-bottom:12px;">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <h3 style="margin:0 0 8px 0; font-size:1.1rem; color:#1f2937;">棚卸締め処理</h3>
+            <p style="color:#6b7280; font-size:0.85rem; margin-bottom:20px; line-height: 1.4;">
+                現在の在庫状況を履歴として保存します。<br>
+                在庫確認を行った「基準日」を選択してください。
+            </p>
+
+            <div style="margin-bottom:24px;">
+                <label for="snapshotDate"
+                    style="display:block; text-align:left; font-size:0.8rem; color:#4b5563; margin-bottom:4px; font-weight:bold;">棚卸基準日</label>
+                <input type="date" id="snapshotDate"
+                    style="width:100%; box-sizing: border-box; padding:12px; font-size:1.1rem; border:1px solid #d1d5db; border-radius:8px; outline:none; color:#1f2937;">
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button id="btnConfirmSnapshot"
+                    style="padding:14px; background:#f59e0b; color:white; border:none; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);">
+                    この日付で保存する
+                </button>
+                <button id="btnCancelSnapshot"
+                    style="padding:12px; border:none; background:transparent; color:#6b7280; font-size:0.9rem; cursor:pointer; text-decoration:underline;">
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>
