@@ -1,10 +1,10 @@
-﻿/**
+/**
  * サロン Mode J 売上管理システム v14.07.00
  * Antigravity Refactored Version
  */
 
 // --- Constants & Config ---
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEDYfdXGs9W0ZyCvzqFnkmezQVW9kokAOPHo4qpO4LjI5t8AodlVuqeuE9axDD9JCV/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzLoCb-t98eSzRm8LjUE_5jneYEyN8vF8NBV_qo6uXZ9adJRkiu1ia1DMkfL8gusvxl/exec';
 const STORAGE_KEY = 'salonSalesData';
 
 // --- State ---
@@ -44,6 +44,7 @@ function loadData() {
                 }
                 return {
                     ...d,
+                    date: normalizeDate(d.date || d.createdAt),
                     totalAmount: Number(d.totalAmount) || 0,
                     items: parsedItems
                 };
@@ -598,7 +599,7 @@ function applyPeriodFilter(period, silent = false) {
         const e = new Date(currentFilter.end);
 
         // --- Constants & Config ---
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEDYfdXGs9W0ZyCvzqFnkmezQVW9kokAOPHo4qpO4LjI5t8AodlVuqeuE9axDD9JCV/exec';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzLoCb-t98eSzRm8LjUE_5jneYEyN8vF8NBV_qo6uXZ9adJRkiu1ia1DMkfL8gusvxl/exec';
         const STORAGE_KEY = 'salonSalesData';
 
         // --- State ---month
@@ -1066,8 +1067,9 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     let totalSales = 0;
     let transactions = 0;
     let customers = new Set();
-    let paymentCounts = { '現金': 0, '振込': 0, 'クレジットカード': 0 };
-    let paymentAmounts = { '現金': 0, '振込': 0, 'クレジットカード': 0 };
+    // Support both 'クレジットカード' and 'カード' for legacy/input consistency
+    let paymentCounts = { '現金': 0, '振込': 0, 'クレジットカード': 0, 'カード': 0 };
+    let paymentAmounts = { '現金': 0, '振込': 0, 'クレジットカード': 0, 'カード': 0 };
     const dailyMap = {};
     const dailyCountMap = {}; // Transactions (Total Items)
     const dailyCustomerMap = {}; // Unique Customers (Set)
@@ -1166,14 +1168,24 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     const methods = ['現金', '振込', 'クレジットカード'];
     let matrixHtml = '';
     methods.forEach(m => {
-        const count = paymentCounts[m];
-        const amt = paymentAmounts[m];
+        // Aggregate 'クレジットカード' and 'カード'
+        let count = paymentCounts[m];
+        let amt = paymentAmounts[m];
+        
+        if (m === 'クレジットカード') {
+            count += paymentCounts['カード'];
+            amt += paymentAmounts['カード'];
+        }
+
         const ratio = totalSales ? ((amt / totalSales) * 100).toFixed(1) : 0;
         const avgPrice = count > 0 ? Math.floor(amt / count) : 0;
+        
+        // Show 'カード' in table for better UI fit
+        const displayMethod = (m === 'クレジットカード') ? 'カード' : m;
 
         matrixHtml += `
             <tr>
-                <td>${m}</td>
+                <td>${displayMethod}</td>
                 <td class="text-right">¥${amt.toLocaleString()}</td>
                 <td class="text-right">${count}件</td>
                 <td class="text-right">${ratio}%</td>
@@ -1184,7 +1196,11 @@ function renderDashboardKPIS(startMonthStr, endMonthStr) {
     document.getElementById('payment-matrix-body').innerHTML = matrixHtml;
 
     if (charts.paymentPie) {
-        charts.paymentPie.data.datasets[0].data = [paymentAmounts['現金'], paymentAmounts['振込'], paymentAmounts['クレジットカード']];
+        charts.paymentPie.data.datasets[0].data = [
+            paymentAmounts['現金'], 
+            paymentAmounts['振込'], 
+            paymentAmounts['クレジットカード'] + paymentAmounts['カード']
+        ];
         charts.paymentPie.update();
     }
 
@@ -1645,13 +1661,44 @@ window.testGASConnection = function () {
         .catch(e => alert('接続失敗: ' + e));
 }
 
+function normalizeDate(dateVal) {
+    if (!dateVal) return new Date().toISOString().split('T')[0];
+    
+    // If it's already YYYY-MM-DD
+    if (typeof dateVal === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
+        return dateVal;
+    }
+
+    try {
+        let d;
+        if (typeof dateVal === 'string') {
+            // Handle "Wed Jan 07 2026 00:00:00 GM" or similar
+            const cleanStr = dateVal.replace(' GM', ' GMT');
+            d = new Date(cleanStr);
+        } else {
+            d = new Date(dateVal);
+        }
+
+        if (isNaN(d.getTime())) {
+            // Last resort: extract YYYY-MM-DD from string if possible
+            const match = String(dateVal).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+            if (match) {
+                return `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
+            }
+            return new Date().toISOString().split('T')[0];
+        }
+
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    } catch (e) {
+        return new Date().toISOString().split('T')[0];
+    }
+}
+
 function formatDateISO(date) {
-    if (typeof date === 'string') return date.split('T')[0];
-    if (!(date instanceof Date) || isNaN(date)) return '';
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    return normalizeDate(date);
 }
 
 function showNotification(msg, type = 'success') {
@@ -1688,31 +1735,13 @@ window.downloadFromGoogleSheets = async function () {
         }
 
         salesData = data.map(d => {
-            let cleanDate = d.date || '';
-
-            // [Trap 1] If date is blank, use createdAt as fallback
-            if (!cleanDate || cleanDate === '') {
-                if (d.createdAt) {
-                    cleanDate = String(d.createdAt).split('T')[0];
-                } else {
-                    cleanDate = new Date().toISOString().split('T')[0];
-                }
-            }
-
-            // [Trap 2] Robust date parsing
-            if (cleanDate && typeof cleanDate === 'string' && cleanDate.includes('T')) {
-                // Force JST
-                const dt = new Date(cleanDate);
-                const y = dt.getFullYear();
-                const m = String(dt.getMonth() + 1).padStart(2, '0');
-                const day = String(dt.getDate()).padStart(2, '0');
-                cleanDate = `${y}-${m}-${day}`;
-            }
+            // Robust date normalization for various formats
+            let cleanDate = normalizeDate(d.date || d.createdAt);
 
             // Fallback for malformed items array
             let items = d.items;
             if (!items && d.products) items = d.products; // Compatibility with older format
-            if (typeof items === 'string') { // Added check for string items
+            if (typeof items === 'string') {
                 try { items = JSON.parse(items); } catch (e) { items = []; }
             }
             if (!Array.isArray(items)) items = [];
