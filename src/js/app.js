@@ -1553,6 +1553,34 @@ window.deleteSale = function (id) {
     if (confirm('削除しますか？')) {
         salesData = salesData.filter(s => s.id !== id);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
+
+        // Sync with Cloud
+        const payload = {
+            action: 'deleteSale',
+            saleId: id
+        };
+
+        fetch(GAS_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json.status === 'success') {
+                    console.log('☁️ Cloud Delete Success');
+                    showNotification('クラウドからも削除しました', 'info');
+                } else {
+                    console.error('Cloud Delete Error:', json);
+                    showNotification('クラウド削除失敗: ' + (json.message || 'unknown'), 'error');
+                }
+            })
+            .catch(e => {
+                console.error('Cloud Delete Network Error:', e);
+                showNotification('クラウド削除失敗 (オフライン)', 'error');
+            });
+
         updateDashboard();
         showNotification('削除しました');
     }
